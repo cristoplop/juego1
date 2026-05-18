@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Contemos! - Actividad 3</title>
+    <link rel="icon" href="img/icono.png">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="contenedor">
+        <img src="https://img.freepik.com/vector-gratis/ninos-divertidos-contando-numeros_23-2148508040.jpg" 
+             alt="Niños contando" class="header-image">
+        
+        <h1>🧮 ¡Contemos!</h1>
+        <p style="font-size:22px; color:#2c3e50;">Observa y selecciona el número correcto</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar"><div class="progress" id="progressBar"></div></div>
+            <div class="progress-text" id="progressText">0 de 8 completados</div>
+        </div>
+
+        <div class="grupo-objetos" id="conteoContainer"></div>
+
+        <button class="btn-transition" onclick="volverAlInicio()">🔙 Volver al inicio</button>
+        <button class="btn-transition" onclick="resetProgress()" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+            🔄 Reiniciar progreso
+        </button>
+    </div>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2702/2702-preview.mp3"></audio>
+    <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="winSound" src="https://assets.mixkit.co/active_storage/sfx/2577/2577-preview.mp3"></audio>
+    <canvas id="confetti"></canvas>
+
+    <script src="js/actividad3.js"></script>
+</body>
+</html>

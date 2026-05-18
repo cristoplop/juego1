@@ -1,0 +1,68 @@
+/* styles.css - combinado desde index.html, actividad2.html, actividad3.html, bienvenido.html */
+
+/* index.html styles */
+body { background: linear-gradient(to bottom, #87CEEB, #ffffff); font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }
+h1 { color: #ff6600; font-size: 40px; margin-bottom: 20px; }
+.contenedor { width: 850px; margin: auto; padding: 30px; border-radius: 20px; background-image: url('../img/fondo.jpg'); background-size: cover; background-position: center; box-shadow: 0px 0px 20px rgba(0,0,0,0.5); }
+.contenido { background-color: rgba(15,101,104,0.9); padding: 20px; border-radius: 20px; }
+input { padding: 12px; width: 250px; border-radius: 10px; border: 2px solid orange; margin-bottom: 20px; font-size: 16px; }
+h3 { color: white; }
+.avatares { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; justify-items: center; margin: 20px 0; }
+.avatares img { width: 120px; height: 120px; object-fit: cover; border-radius: 15px; cursor: pointer; transition: transform 0.3s; border: 3px solid transparent; background-color: white; }
+.avatares img:hover { transform: scale(1.1); border: 3px solid orange; }
+.seleccionado { border: 4px solid yellow !important; }
+button { padding: 12px 25px; background-color: orange; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; transition: 0.3s; }
+button:hover { background-color: #ff6600; color: white; }
+canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
+
+/* actividad2.html styles */
+body.activity2, body { font-family: 'Comic Sans MS', cursive; background: linear-gradient(to bottom, #a8e6cf, #d4f4dd); margin: 0; padding: 20px; text-align: center; }
+h1 { color: #ff6b6b; font-size: 42px; margin-bottom: 10px; text-shadow: 3px 3px 0px #fff; }
+.contenedor { max-width: 1000px; margin: auto; background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.seccion { margin: 35px 0; }
+.numeros { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin: 30px 0; }
+.numero { width: 130px; height: 130px; font-size: 55px; font-weight: bold; color: white; border-radius: 25px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+.numero:hover { transform: scale(1.15); }
+.numero.activo { transform: scale(1.35); box-shadow: 0 0 40px 20px #ffff00, 0 0 60px 30px #ffeb3b, 0 0 80px 40px #ff9800; border: 6px solid #fff; z-index: 10; }
+.btn-transition { padding: 20px 50px; font-size: 28px; background: linear-gradient(45deg, #ff9f1c, #ff6b6b); color: white; border: none; border-radius: 50px; cursor: pointer; margin: 30px 0; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transition: all 0.4s; }
+.btn-transition:hover { transform: scale(1.1) translateY(-5px); }
+.conteo { margin: 40px 0; }
+.grupo-objetos { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 25px 0; }
+.card { background: #f8f9fa; border-radius: 20px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+.objetos { font-size: 60px; margin: 15px 0; min-height: 80px; }
+.opciones { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 15px; }
+.opcion { width: 60px; height: 60px; font-size: 28px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
+
+/* actividad3.html styles */
+body.activity3 { font-family: 'Comic Sans MS', cursive, sans-serif; background: linear-gradient(to bottom, #a8e6cf, #d4f4dd); }
+.header-image { max-width: 180px; margin: 15px auto; }
+.progress-container { margin: 20px 0 25px; }
+.progress-bar { height: 14px; background: #ddd; border-radius: 10px; overflow: hidden; }
+.progress { height: 100%; background: linear-gradient(90deg, #4ecdc4, #45b7d1); width: 0%; transition: width 0.6s ease; }
+.grupo-objetos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin: 30px 0; }
+.card { background: #f8f9fa; border-radius: 25px; padding: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: all 0.3s; position: relative; }
+.card.completed { background: #e8f8f0; border: 3px solid #27ae60; }
+.card.completed::after { content: "✅ Completado"; position: absolute; top: 12px; right: 12px; background: #27ae60; color: white; font-size: 14px; padding: 4px 10px; border-radius: 20px; }
+.pregunta-container { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 15px; min-height: 55px; }
+.pregunta-texto { font-size: 19px; color: #2c3e50; font-weight: bold; }
+.cantidad-circular { width: 52px; height: 52px; background: linear-gradient(45deg, #4ecdc4, #45b7d1); color: white; font-size: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 4px solid white; cursor: pointer; }
+.objetos { font-size: 38px; margin: 15px 0; min-height: 55px; line-height: 1.1; }
+.opciones { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 15px; }
+.opcion { width: 48px; height: 48px; font-size: 22px; font-weight: bold; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #ff6b6b; color: white; transition: all 0.2s; }
+.opcion:hover { transform: scale(1.2); }
+.resultado { margin-top: 12px; font-size: 19px; min-height: 32px; font-weight: bold; }
+.btn-transition { padding: 16px 45px; font-size: 24px; background: linear-gradient(45deg, #ff9f1c, #ff6b6b); color: white; border: none; border-radius: 50px; cursor: pointer; margin: 10px 8px; }
+
+/* bienvenido.html styles */
+body.bienvenido { background: linear-gradient(to bottom, #87CEEB, white); font-family: Arial, sans-serif; text-align: center; padding-top: 50px; }
+.caja { width: 500px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0px 0px 20px gray; }
+h1 { color: orange; font-size: 45px; }
+h2 { color: #333; }
+img { width: 200px; height: 200px; object-fit: cover; border-radius: 20px; margin-top: 20px; background-color: white; }
+.caja button { margin-top: 25px; padding: 12px 25px; border: none; border-radius: 10px; background-color: orange; color: white; font-size: 18px; cursor: pointer; }
+.caja button:hover { background-color: #ff6600; }
+
+/* helpers */
+.hidden { display: none !important; }
+
+/* end of styles */

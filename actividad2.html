@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Aprendamos los Números!</title>
+    <link rel="icon" href="img/icono.png">
+    
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <div class="contenedor">
+        <h1>🎉 ¡Aprendamos los Números del 1 al 10! 🎉</h1>
+
+        <!-- SECCIÓN APRENDIENDO -->
+        <div class="seccion" id="seccionAprender">
+            <h2 style="color:#2c3e50;">📚 Fase 1: Aprendiendo</h2>
+            <p style="font-size:24px; color:#2c3e50;">Haz clic en los números para escucharlos</p>
+
+            <button onclick="escucharTodos()">
+                🔊 Escuchar Todos los Números
+            </button>
+
+            <div class="numeros" id="numerosContainer"></div>
+        </div>
+
+        <button class="btn-transition" onclick="window.location.href='actividad3.html'">
+            🚀 ¡Ahora vamos a practicar! 🧮
+        </button>
+
+        <!-- SECCIÓN PRACTICANDO -->
+        <div class="seccion" id="seccionPracticar" style="display: none;">
+            <h2 style="color:#2c3e50;">🧮 Fase 2: Aplicando lo aprendido</h2>
+            <p style="font-size:22px; color:#2c3e50;">¿Cuántos objetos ves? Toca el número correcto</p>
+            <div class="grupo-objetos" id="conteoContainer"></div>
+        </div>
+
+        <button id="volverInicioBtn" class="btn-transition" style="display:none;" onclick="volverAlInicio()">
+            🔙 Volver al inicio
+        </button>
+    </div>
+
+    <!-- Audios -->
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2702/2702-preview.mp3"></audio>
+    <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+
+    <canvas id="confetti"></canvas>
+
+    <script src="js/actividad2.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+// =====================================================
+// JUEGO DE AVENTURA - PANTALLA DE INICIO
+// =====================================================
+
+// ========== AUDIOS ==========
+const bienvenidaSound = new Audio("../sonido/bienvenida.mp3");
+const errorSound = new Audio("../sonido/error.mp3");
+const avatarSound = new Audio("../sonido/avatar.mp3");
+
+// ========== VARIABLES GLOBALES ==========
+let avatarSeleccionado = null;
+
+// =====================================================
+// FUNCIONES
+// =====================================================
+
+/**
+ * Selecciona un avatar y guarda la selección
+ * @param {string} avatar - Nombre del archivo del avatar
+ */
+function seleccionarAvatar(avatar) {
+    // Guardar avatar seleccionado
+    avatarSeleccionado = avatar;
+
+    // Reproducir sonido de selección
+    avatarSound.currentTime = 0;
+    avatarSound.play();
+
+    // Quitar selección anterior
+    const avatares = document.querySelectorAll(".avatar");
+    avatares.forEach(a => {
+        a.classList.remove("activo");
+    });
+
+    // Marcar nuevo avatar seleccionado
+    document.getElementById(avatar).classList.add("activo");
+}
+
+/**
+ * Valida y procesa el ingreso del usuario
+ * Requiere nombre y avatar seleccionado
+ */
+function ingresar() {
+    const nombre = document.getElementById("nombre").value.trim();
+
+    // Validación 1: Sin nombre y sin avatar
+    if (nombre === "" && avatarSeleccionado === null) {
+        errorSound.currentTime = 0;
+        errorSound.play();
+        alert("❌ Debes ingresar nombre y seleccionar un avatar");
+        return;
+    }
+
+    // Validación 2: Falta solo uno
+    if (nombre === "" || avatarSeleccionado === null) {
+        errorSound.currentTime = 0;
+        errorSound.play();
+        alert("⚠️ Completa todos los datos");
+        return;
+    }
+
+    // Validación 3: Todo correcto
+    bienvenidaSound.currentTime = 0;
+    bienvenidaSound.play();
+
+    // Guardar datos en localStorage
+    localStorage.setItem("nombre", nombre);
+    localStorage.setItem("avatar", avatarSeleccionado);
+
+    // Efecto visual
+    document.getElementById("contenido").classList.add("efecto");
+
+    alert("🎉 ¡Bienvenido " + nombre + "!");
+
+    // Esperar sonido antes de redirigir
+    setTimeout(() => {
+        window.location.href = "bienvenida.html";
+    }, 2000);
+}
