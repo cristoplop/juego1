@@ -3,50 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Aprendamos los Números!</title>
-    <link rel="icon" href="img/icono.png">
+    <title>🔢 Aprendamos los Números - Hora de Aventura</title>
     
-    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 { 
+            color: #FF6B00; 
+            font-size: 3.5rem; 
+            margin-bottom: 10px; 
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3); 
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin: 15px 0 25px 0;
+        }
+
+        .contenedor { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+
+        .numeros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .tarjeta {
+            background: white;
+            border-radius: 25px;
+            padding: 20px 15px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            transition: all 0.4s;
+            cursor: pointer;
+            border: 5px solid #FFCC00;
+            position: relative;
+        }
+
+        .tarjeta:hover { 
+            transform: scale(1.08); 
+        }
+
+        .tarjeta.activo {
+            border-color: #00FF00;
+            box-shadow: 0 0 25px #00FF00;
+            transform: scale(1.12);
+            background: #F0FFF0;
+        }
+
+        .numero {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #FF4500;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .palabra {
+            font-size: 2.1rem;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .palabra-en {
+            font-size: 1.4rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Nueva sección para mostrar las estrellas */
+        .visualizacion {
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 25px;
+            min-height: 120px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 3.2rem;
+        }
+
+        button {
+            margin: 15px 10px;
+            padding: 15px 35px;
+            font-size: 1.6rem;
+            background: #FF6B00;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover { 
+            background: #FF4500; 
+            transform: scale(1.05);
+        }
+
+        .btn-practicar {
+            background: #00C853;
+            font-size: 1.8rem;
+            padding: 18px 40px;
+            margin-top: 40px;
+        }
+
+        .btn-practicar:hover {
+            background: #00B140;
+        }
+
+        .user-profile {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            max-width: 260px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .user-profile img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #FF6B00;
+        }
+
+        .user-profile .user-name {
+            margin: 0;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
 
+    <div class="user-profile" id="userProfile" style="display:none;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario">
+        <p class="user-name" id="userName">--</p>
+    </div>
+
     <div class="contenedor">
-        <h1>🎉 ¡Aprendamos los Números del 1 al 10! 🎉</h1>
+        <h1>🎮 Hora de Aventura</h1>
+        <h2>🔢 Aprende los Números del 1 al 10</h2>
 
-        <!-- SECCIÓN APRENDIENDO -->
-        <div class="seccion" id="seccionAprender">
-            <h2 style="color:#2c3e50;">📚 Fase 1: Aprendiendo</h2>
-            <p style="font-size:24px; color:#2c3e50;">Haz clic en los números para escucharlos</p>
+        <div class="numeros-grid" id="grid"></div>
 
-            <button onclick="escucharTodos()">
-                🔊 Escuchar Todos los Números
-            </button>
+        <!-- Zona donde aparecerán las estrellas -->
+        <div class="visualizacion" id="visualizacion"></div>
 
-            <div class="numeros" id="numerosContainer"></div>
-        </div>
-
-        <button class="btn-transition" onclick="window.location.href='actividad3.html'">
+        <button id="btnEscuchar">🔊 Escuchar todos los números</button>
+        
+        <button class="btn-practicar" onclick="window.location.href='actividad3.html'">
             🚀 ¡Ahora vamos a practicar! 🧮
-        </button>
-
-        <!-- SECCIÓN PRACTICANDO -->
-        <div class="seccion" id="seccionPracticar" style="display: none;">
-            <h2 style="color:#2c3e50;">🧮 Fase 2: Aplicando lo aprendido</h2>
-            <p style="font-size:22px; color:#2c3e50;">¿Cuántos objetos ves? Toca el número correcto</p>
-            <div class="grupo-objetos" id="conteoContainer"></div>
-        </div>
-
-        <button id="volverInicioBtn" class="btn-transition" style="display:none;" onclick="volverAlInicio()">
-            🔙 Volver al inicio
         </button>
     </div>
 
-    <!-- Audios -->
-    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2702/2702-preview.mp3"></audio>
-    <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <script>
+        const numeros = [
+            { num: 1, palabra: "uno", english: "one" },
+            { num: 2, palabra: "dos", english: "two" },
+            { num: 3, palabra: "tres", english: "three" },
+            { num: 4, palabra: "cuatro", english: "four" },
+            { num: 5, palabra: "cinco", english: "five" },
+            { num: 6, palabra: "seis", english: "six" },
+            { num: 7, palabra: "siete", english: "seven" },
+            { num: 8, palabra: "ocho", english: "eight" },
+            { num: 9, palabra: "nueve", english: "nine" },
+            { num: 10, palabra: "diez", english: "ten" }
+        ];
 
-    <canvas id="confetti"></canvas>
+        const grid = document.getElementById('grid');
+        const visualizacion = document.getElementById('visualizacion');
+        const btnEscuchar = document.getElementById('btnEscuchar');
+        let isPlaying = false;
 
-    <script src="js/actividad2.js"></script>
+        numeros.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'tarjeta';
+            div.dataset.num = item.num;
+
+            div.innerHTML = `
+                <div class="numero">${item.num}</div>
+                <div class="palabra">${item.palabra}</div>
+                <div class="palabra-en">${item.english}</div>
+            `;
+
+            div.addEventListener('click', () => {
+                if (isPlaying) return;
+                
+                speechSynthesis.cancel();
+                decirNumero(item.palabra);
+                
+                // Mostrar estrellas correspondientes
+                mostrarEstrellas(item.num);
+            });
+
+            grid.appendChild(div);
+        });
+
+        function decirNumero(texto) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(texto);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.95;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function mostrarEstrellas(cantidad) {
+            visualizacion.innerHTML = '';
+            visualizacion.style.display = 'flex';
+            
+            for (let i = 0; i < cantidad; i++) {
+                const estrella = document.createElement('span');
+                estrella.textContent = '⭐';
+                visualizacion.appendChild(estrella);
+            }
+        }
+
+        // Reproducir todos
+        async function repetirTodo() {
+            if (isPlaying) return;
+            
+            isPlaying = true;
+            btnEscuchar.disabled = true;
+            visualizacion.style.display = 'none'; // Ocultar estrellas al reproducir todos
+            
+            const tarjetas = document.querySelectorAll('.tarjeta');
+            
+            for (let i = 0; i < numeros.length; i++) {
+                tarjetas.forEach(t => t.classList.remove('activo'));
+                tarjetas[i].classList.add('activo');
+                
+                decirNumero(numeros[i].palabra);
+                await new Promise(resolve => setTimeout(resolve, 1600));
+            }
+            
+            tarjetas.forEach(t => t.classList.remove('activo'));
+            isPlaying = false;
+            btnEscuchar.disabled = false;
+        }
+
+        btnEscuchar.addEventListener('click', repetirTodo);
+    </script>
+    <script src="js/profile.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Felicidades!</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-profile {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.95);
+            padding: 10px 14px;
+            border-radius: 999px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            z-index: 1000;
+        }
+        .user-profile img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #FF6B00;
+        }
+        .user-profile .user-name {
+            margin: 0;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .contenido { z-index: 10; }
+        h1 { font-size: 5rem; margin: 20px 0; text-shadow: 0 0 30px gold; }
+        p { font-size: 2.2rem; margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="user-profile" id="userProfile" style="display:none;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario">
+        <p class="user-name" id="userName">--</p>
+    </div>
+    <div class="contenido">
+        <h1>¡FELICIDADES! 🎉</h1>
+        <p>Has completado todos los niveles</p>
+        <h2 style="font-size: 3rem; color: #FFD700;">¡Eres un campeón! 🏆</h2>
+    </div>
+
+    <audio id="winAudio" autoplay>
+        <source src="https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <canvas id="confetti" style="position:fixed; top:0; left:0; width:100%; height:100%; z-index:1;"></canvas>
+
+    <script>
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles = [];
+        for (let i = 0; i < 300; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: Math.random() * 15 + 8,
+                speed: Math.random() * 12 + 7,
+                color: `hsl(${Math.random()*360}, 90%, 65%)`,
+                rotation: Math.random() * 360,
+                rs: Math.random() * 15 - 7
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                p.y += p.speed;
+                p.rotation += p.rs;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+                if (p.y > canvas.height + 50) particles.splice(i, 1);
+            });
+            if (particles.length > 0) requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+    <script src="js/profile.js" defer></script>
+</body>
+</html>

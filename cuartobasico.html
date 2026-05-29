@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>➕➖ Sumas y Restas - Juego 2</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(to bottom, #FFEBB8, #FFCC80);
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 { color: #D32F2F; font-size: 3rem; margin: 15px 0; }
+
+        .score-container {
+            position: fixed; top: 15px; left: 15px; background: white; 
+            padding: 12px 25px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.5rem; z-index: 1000;
+        }
+
+        .user-profile {
+            position: fixed; top: 15px; right: 15px; background: white; padding: 8px 12px;
+            border-radius: 999px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .user-profile img {
+            width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 3px solid #FF6B00;
+        }
+
+        .problema {
+            background: white; border-radius: 25px; padding: 40px; margin: 30px auto;
+            max-width: 700px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .operacion {
+            font-size: 3.8rem; font-weight: bold; color: #2c3e50; margin: 25px 0;
+        }
+
+        .opciones {
+            display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin: 30px 0;
+        }
+
+        .opcion {
+            width: 130px; height: 130px; background: #FF6B00; color: white;
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 2.8rem; font-weight: bold; cursor: pointer; box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        .opcion:hover { transform: scale(1.12); background: #FF4500; }
+
+        .drop-zone {
+            border: 5px dashed #2c3e50; border-radius: 20px; width: 190px; height: 170px;
+            margin: 30px auto; display: flex; align-items: center; justify-content: center;
+            font-size: 4.2rem; font-weight: bold; background: #f8f8f8;
+            transition: all 0.4s;
+        }
+        .drop-zone.correct { border-color: #00C853; background: #E8F5E9; }
+        .drop-zone.incorrect { border-color: #e74c3c; background: #fce8e6; }
+
+        button {
+            margin: 15px 10px; padding: 16px 45px; font-size: 1.7rem; border: none;
+            border-radius: 50px; cursor: pointer;
+        }
+        #verificarBtn { background: #1976D2; color: white; }
+        #nextBtn { background: #388E3C; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="score-container">
+        ⭐ Puntaje: <strong class="score-display">0</strong>
+    </div>
+
+    <div class="user-profile" id="userProfile" style="display:none;">
+        <img id="userAvatar" src="" alt="Avatar">
+        <p class="user-name" id="userName">--</p>
+    </div>
+
+    <h1>➕➖ Sumas y Restas</h1>
+    <h2 id="nivel">Problema 1 de 8</h2>
+
+    <div class="problema">
+        <p style="font-size:1.8rem; margin-bottom:20px;">¿Cuánto es?</p>
+        <div class="operacion" id="operacion"></div>
+        
+        <div class="drop-zone" id="dropZone" ondrop="drop(event)" ondragover="allowDrop(event)">
+            Arrastra aquí
+        </div>
+
+        <div class="opciones" id="opciones"></div>
+    </div>
+
+    <!-- BOTONES -->
+    <button id="verificarBtn" onclick="verificarRespuesta()">✅ Verificar</button>
+    <button id="nextBtn" onclick="siguienteProblema()" style="display: none;">▶️ Siguiente →</button>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2702/2702-preview.mp3"></audio>
+    <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <canvas id="confetti" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; display:none;"></canvas>
+
+    <script src="js/score.js" defer></script>
+    <script src="js/profile.js" defer></script>
+
+    <script>
+        let problemaActual = 0;
+        let respuestaCorrecta = 0;
+
+        const problemas = [
+            { op: "456 + 278 =", res: 734 },
+            { op: "892 - 345 =", res: 547 },
+            { op: "567 + 389 =", res: 956 },
+            { op: "1234 - 567 =", res: 667 },
+            { op: "678 + 245 =", res: 923 },
+            { op: "1500 - 678 =", res: 822 },
+            { op: "789 + 456 =", res: 1245 },
+            { op: "2000 - 987 =", res: 1013 }
+        ];
+
+        function hablar(texto) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(texto);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function cargarProblema() {
+            const p = problemas[problemaActual];
+            respuestaCorrecta = p.res;
+            
+            document.getElementById('nivel').textContent = `Problema ${problemaActual + 1} de 8`;
+            document.getElementById('operacion').textContent = p.op;
+            
+            resetDropZone();
+            document.getElementById('verificarBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'none';
+
+            generarOpciones();
+        }
+
+        function resetDropZone() {
+            const dropZone = document.getElementById('dropZone');
+            dropZone.innerHTML = 'Arrastra aquí';
+            dropZone.classList.remove('correct', 'incorrect');
+            delete dropZone.dataset.respuesta;
+        }
+
+        function generarOpciones() {
+            const container = document.getElementById('opciones');
+            container.innerHTML = '';
+            
+            let opciones = [respuestaCorrecta];
+            while (opciones.length < 4) {
+                let wrong = respuestaCorrecta + Math.floor(Math.random() * 90) - 45;
+                if (!opciones.includes(wrong)) opciones.push(wrong);
+            }
+            opciones.sort(() => Math.random() - 0.5);
+
+            opciones.forEach(num => {
+                const div = document.createElement('div');
+                div.className = 'opcion';
+                div.draggable = true;
+                div.textContent = num;
+                div.ondragstart = (e) => e.dataTransfer.setData("text", num);
+                div.addEventListener('click', () => hablar(num.toString()));
+                container.appendChild(div);
+            });
+        }
+
+        function allowDrop(ev) { ev.preventDefault(); }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const num = parseInt(ev.dataTransfer.getData("text"));
+            const dropZone = document.getElementById('dropZone');
+            dropZone.innerHTML = num;
+            dropZone.dataset.respuesta = num;
+        }
+
+        function verificarRespuesta() {
+            const dropZone = document.getElementById('dropZone');
+            const respuesta = parseInt(dropZone.dataset.respuesta);
+
+            if (isNaN(respuesta)) {
+                alert("¡Arrastra un número primero!");
+                return;
+            }
+
+            if (respuesta === respuestaCorrecta) {
+                document.getElementById('correctSound').play();
+                dropZone.classList.add('correct');
+                addPoints(20);
+                mostrarConfeti();
+
+                document.getElementById('verificarBtn').style.display = 'none';
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('errorSound').play();
+                dropZone.classList.add('incorrect');
+                setTimeout(() => dropZone.classList.remove('incorrect'), 1600);
+            }
+        }
+
+        function mostrarConfeti() {
+            const canvas = document.getElementById('confetti');
+            canvas.style.display = 'block';
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            for (let i = 0; i < 280; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 14 + 8,
+                    speed: Math.random() * 11 + 7,
+                    color: `hsl(${Math.random()*360}, 90%, 65%)`,
+                    rotation: Math.random() * 360,
+                    rs: Math.random() * 15 - 7
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+                particles.forEach((p, i) => {
+                    p.y += p.speed;
+                    p.rotation += p.rs;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation * Math.PI / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                    ctx.restore();
+                    if (p.y < canvas.height + 100) alive = true;
+                });
+                if (alive) requestAnimationFrame(animate);
+                else canvas.style.display = 'none';
+            }
+            animate();
+        }
+
+        function siguienteProblema() {
+            if (problemaActual < problemas.length - 1) {
+                problemaActual++;
+                cargarProblema();
+            } else {
+                window.location.href = 'juego3.html';
+            }
+        }
+
+        window.onload = cargarProblema;
+    </script>
+</body>
+</html>

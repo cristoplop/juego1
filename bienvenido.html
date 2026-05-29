@@ -10,6 +10,11 @@
 
 <body>
 
+<div class="user-profile" id="userProfile" style="display:none;">
+    <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario">
+    <p class="user-name" id="userName">--</p>
+</div>
+
 <div class="caja">
 
     <h1>🎉 Bienvenido</h1>
@@ -21,9 +26,11 @@
     <br>
     <div style="margin-top:18px">
         <button onclick="volver()">Volver</button>
-        <button onclick="continuar()">Vamos a aprender</button>
+        <button onclick="continuar()">Primero básico</button>
+        <button onclick="window.location.href='cuartobasico.html'">Cuarto básico</button>
     </div>
     
+    <script src="js/profile.js" defer></script>
     <script src="js/bienvenido.js"></script>
     <script>
 

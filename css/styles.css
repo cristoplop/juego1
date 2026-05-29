@@ -13,6 +13,37 @@ h3 { color: white; }
 .seleccionado { border: 4px solid yellow !important; }
 button { padding: 12px 25px; background-color: orange; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; transition: 0.3s; }
 button:hover { background-color: #ff6600; color: white; }
+
+.user-profile {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto 20px auto;
+    max-width: 260px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.92);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.user-profile img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FF6B00;
+}
+
+.user-profile .user-name {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
 
 /* actividad2.html styles */
@@ -36,6 +67,41 @@ h1 { color: #ff6b6b; font-size: 42px; margin-bottom: 10px; text-shadow: 3px 3px 
 /* actividad3.html styles */
 body.activity3 { font-family: 'Comic Sans MS', cursive, sans-serif; background: linear-gradient(to bottom, #a8e6cf, #d4f4dd); }
 .header-image { max-width: 180px; margin: 15px auto; }
+.user-profile {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: white;
+    border-radius: 50px;
+    padding: 8px 15px 8px 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    z-index: 1000;
+    max-width: 220px;
+}
+.user-profile img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FF6B00;
+}
+.user-info { text-align: left; }
+.user-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.user-label {
+    font-size: 0.75rem;
+    color: #999;
+    margin: 0;
+}
 .progress-container { margin: 20px 0 25px; }
 .progress-bar { height: 14px; background: #ddd; border-radius: 10px; overflow: hidden; }
 .progress { height: 100%; background: linear-gradient(90deg, #4ecdc4, #45b7d1); width: 0%; transition: width 0.6s ease; }

@@ -1,0 +1,128 @@
+
+
+    * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+    text-align: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+h1 {
+    color: #FF6B00;
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+}
+
+h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.user-profile {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin: 0 auto 20px auto;
+    max-width: 260px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.95);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+.user-profile img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #FF6B00;
+}
+
+.user-profile .user-name {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.contenedor {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.numeros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.tarjeta {
+    background: white;
+    border-radius: 25px;
+    padding: 25px 15px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    transition: all 0.4s;
+    cursor: pointer;
+    border: 5px solid #FFCC00;
+}
+
+.tarjeta:hover {
+    transform: scale(1.08);
+}
+
+.tarjeta.activo {
+    border-color: #00FF00;
+    box-shadow: 0 0 25px #00FF00;
+    transform: scale(1.12);
+    background: #F0FFF0;
+}
+
+.numero {
+    font-size: 6rem;
+    font-weight: bold;
+    color: #FF4500;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.palabra {
+    font-size: 2.1rem;
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+button {
+    margin-top: 30px;
+    padding: 15px 35px;
+    font-size: 1.6rem;
+    background: #FF6B00;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #FF4500;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
