@@ -5,7 +5,9 @@ const ctx = canvas.getContext("2d");
 
 function resizeCanvas(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 
-function launchConfetti(duration = 2000){ resizeCanvas(); const particles = Array.from({length:200},()=>new Particle()); const start=Date.now(); function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(let i=particles.length-1;i>=0;i--){ particles[i].update(); particles[i].draw(); if(particles[i].y>canvas.height) particles.splice(i,1); } if(Date.now()-start<duration&&particles.length>0) requestAnimationFrame(animate); } animate(); }
+function launchConfetti(duration = 2000){
+	try { if (window.startConfetti) window.startConfetti(duration); } catch(e) {}
+}
 
 class Particle{ constructor(){ this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height-canvas.height; this.size=Math.random()*12+8; this.speed=Math.random()*7+5; this.angle=Math.random()*360; this.color=`hsl(${Math.random()*360},100%,60%)`; } update(){ this.y+=this.speed; this.angle+=8; } draw(){ ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.angle*Math.PI/180); ctx.fillStyle=this.color; ctx.fillRect(-this.size/2,-this.size/2,this.size,this.size); ctx.restore(); } }
 

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby - Juegos de Matemáticas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(to bottom, #FFEBB8, #FFCC80);
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #D32F2F;
+            font-size: 3rem;
+            margin: 20px 0;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+        }
+        .subtitle {
+            font-size: 1.6rem;
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
+
+        .games-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+
+        .game-card h3 {
+            font-size: 1.6rem;
+            color: #D32F2F;
+            margin: 15px 0;
+        }
+
+        .emoji {
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px 30px;
+            font-size: 1.4rem;
+            border: none;
+            border-radius: 50px;
+            background: #1976D2;
+            color: white;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background: #FF6B00;
+        }
+        .reset-btn {
+            display: inline-block;
+            margin: 0 auto 24px auto;
+            padding: 12px 28px;
+            font-size: 1.2rem;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transition: transform 0.2s, background 0.2s;
+        }
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            background: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="user-profile" id="userProfile" style="display:none; position: fixed; top: 15px; right: 15px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #FF6B00;">
+        <p class="user-name" id="userName" style="margin:0; font-weight:bold; font-size:1rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">--</p>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">← Volver</button>
+
+    <h1>🎮 Lobby de Matemáticas</h1>
+    <p class="subtitle">4° Básico - Elige tu juego favorito</p>
+    <div class="score-summary" style="max-width: 640px; margin: 0 auto 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; text-align: left;">
+        <div class="score-card" style="background:#fff; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#555; margin-bottom:8px;">Sumas y Restas</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="scoreSumasRestas">0</span> pts</div>
+        </div>
+        <div class="score-card" style="background:#fff; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#555; margin-bottom:8px;">Divisiones</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="scoreDividir">0</span> pts</div>
+        </div>
+        <div class="score-card" style="background:#fff; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#555; margin-bottom:8px;">Multiplicación</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="scoreMultiplicacion">0</span> pts</div>
+        </div>
+        <div class="score-card" style="background:#fff; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#555; margin-bottom:8px;">Números 10000</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="scoreNumeros10000">0</span> pts</div>
+        </div>
+        <div class="score-card" style="background:#fff; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#555; margin-bottom:8px;">Desafío</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="scoreDesafio">0</span> pts</div>
+        </div>
+        <div class="score-card" style="background:#fff; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#555; margin-bottom:8px;">Problemas</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="scoreProblemas">0</span> pts</div>
+        </div>
+        <div class="score-card" style="background:#ffeb3b; padding:16px 18px; border-radius:18px; box-shadow:0 8px 20px rgba(0,0,0,0.08);">
+            <div style="font-size:0.95rem; color:#333; margin-bottom:8px;">Total</div>
+            <div style="font-size:1.6rem; font-weight:700;"> <span id="totalScoreDisplay">0</span> pts</div>
+        </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetScores()">🔄 Reiniciar puntaje</button>
+
+    <div class="games-grid">
+
+        <div class="game-card" onclick="window.location.href='cuartobasico.html'">
+            <div class="emoji">➕➖</div>
+            <h3>Sumas y Restas</h3>
+            <p>¡Practica sumas y restas con arrastre!</p>
+            <button>▶️ Jugar</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='multiplicacion.html'">
+            <div class="emoji">✖️</div>
+            <h3>Multiplicación</h3>
+            <p>Tablas y multiplicaciones divertidas</p>
+            <button>▶️ Jugar</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='dividir.html'">
+
+            <div class="emoji">➗</div>
+            <h3>Divisiones</h3>
+            <p>Aprende a dividir paso a paso</p>
+            <button>▶️ Jugar</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='problemas.html'">
+            <div class="emoji">📝</div>
+            <h3>Problemas</h3>
+            <p>Problemas con contexto</p>
+            <button>▶️ Jugar</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='numeros10000.html'">
+            <div class="emoji">🔢</div>
+            <h3>Números hasta 10.000</h3>
+            <p>Redondeo, comparación y más</p>
+            <button>▶️ Jugar</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='desafio.html'">
+            <div class="emoji">⏱️</div>
+            <h3>Desafío Rápido</h3>
+            <p>¡Compite contra el tiempo!</p>
+            <button>▶️ Jugar</button>
+        </div>
+
+    </div>
+
+    <script>
+        function leerPuntaje(key) {
+            try {
+                const value = parseInt(localStorage.getItem(key) || '0', 10);
+                return isNaN(value) ? 0 : value;
+            } catch (e) {
+                console.warn(`No se pudo leer ${key}`, e);
+                return 0;
+            }
+        }
+
+        function actualizarPuntajesLobby() {
+            const scoreSumasRestas = leerPuntaje('score_sumas_resta');
+            const scoreDividir = leerPuntaje('score_dividir');
+            const scoreMultiplicacion = leerPuntaje('score_multiplicacion');
+            const scoreNumeros10000 = leerPuntaje('score_numeros10000');
+            const scoreDesafio = leerPuntaje('score_desafio');
+            const scoreProblemas = leerPuntaje('score_problemas');
+            const total = scoreSumasRestas + scoreDividir + scoreMultiplicacion + scoreNumeros10000 + scoreDesafio + scoreProblemas;
+
+            document.getElementById('scoreSumasRestas').textContent = scoreSumasRestas;
+            document.getElementById('scoreDividir').textContent = scoreDividir;
+            document.getElementById('scoreMultiplicacion').textContent = scoreMultiplicacion;
+            document.getElementById('scoreNumeros10000').textContent = scoreNumeros10000;
+            document.getElementById('scoreDesafio').textContent = scoreDesafio;
+            document.getElementById('scoreProblemas').textContent = scoreProblemas;
+            document.getElementById('totalScoreDisplay').textContent = total;
+        }
+
+        function resetScores() {
+            const keys = [
+                'score_sumas_resta',
+                'score_dividir',
+                'score_multiplicacion',
+                'score_numeros10000',
+                'score_desafio',
+                'score_problemas'
+            ];
+            keys.forEach(key => localStorage.removeItem(key));
+            actualizarPuntajesLobby();
+            alert('✅ Puntajes reiniciados');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log("Lobby cargado correctamente");
+            actualizarPuntajesLobby();
+        });
+    </script>
+    <script src="js/profile.js" defer></script>
+</body>
+</html>

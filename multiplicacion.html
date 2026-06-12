@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✖️ Multiplicaciones - 4° Básico</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(to bottom, #FFEBB8, #FF9800);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar { width: 240px; background: #0A0A0A; color: white; padding: 20px; border-right: 8px solid #FFD700; overflow-y: auto; }
+        .sidebar h3 { color: #00C853; margin-bottom: 15px; text-align: center; }
+
+        .problema-item {
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #1F1F1F;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .problema-item:hover { transform: scale(1.03); }
+        .problema-item.correct { background: #1B5E20; border-left: 5px solid #00C853; cursor: default; }
+        .problema-item.incorrect { background: #B71C1C; border-left: 5px solid #E53935; }
+
+        .main-content { flex: 1; padding: 20px; display: flex; justify-content: center; }
+        .game-container {
+            max-width: 800px;
+            width: 100%;
+            background: #0A0A0A;
+            border: 18px solid #00C853;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            padding: 30px 20px;
+        }
+
+        h1 { color: white; font-size: 2.8rem; margin-bottom: 10px; text-shadow: 0 0 10px #00C853; }
+        .pregunta { font-size: 2.6rem; color: white; margin: 30px 0; font-weight: bold; text-align: center; }
+
+        .opciones {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .opcion {
+            width: 180px;
+            height: 140px;
+            background: #111;
+            border: 6px solid #FFD700;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+        }
+
+        .opcion:hover { transform: scale(1.1); background: #222; }
+        .opcion.correct { border-color: #00C853; background: #1B5E20; }
+        .opcion.incorrect { border-color: #E53935; background: #B71C1C; }
+
+        .info-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            color: white;
+            font-size: 1.3rem;
+        }
+
+        .botones {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 14px 40px;
+            font-size: 1.6rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            min-width: 220px;
+        }
+        #verificarBtn { background: #1976D2; color: white; }
+        #nextBtn { background: #388E3C; color: white; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="user-profile" id="userProfile" style="display:none; position: fixed; top: 15px; right: 15px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #FF6B00;">
+        <p class="user-name" id="userName" style="margin:0; font-weight:bold; font-size:1rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">--</p>
+    </div>
+
+    <div class="sidebar">
+        <h3>Progreso</h3>
+        <div id="listaProblemas"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="game-container">
+            <h1>✖️ MULTIPLICACIONES</h1>
+            <div class="pregunta" id="pregunta"></div>
+            <div class="opciones" id="opciones"></div>
+
+            <div class="info-bar">
+                <div>Puntuación: <strong id="puntos">0</strong></div>
+                <div>Problema <strong id="problemaActual">1</strong>/10</div>
+            </div>
+
+            <div class="botones">
+                <button id="verificarBtn" onclick="verificarRespuesta()">✅ Verificar</button>
+                <button id="nextBtn" onclick="siguienteProblema()">▶️ Siguiente →</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3"></audio>
+    <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
+    <audio id="warningSound" src="https://assets.mixkit.co/active_storage/sfx/2702/2702-preview.mp3"></audio>
+    <canvas id="confetti" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; display:none;"></canvas>
+
+    <script>
+        let modoRevision = false;
+        let problemaActual = 0;
+        let puntos = 0;
+        let respuestaCorrecta = 0;
+        let seleccionada = null;
+        let yaVerificado = false;
+
+        let estadoProblemas = new Array(10).fill(null); // null = no intentado, "primera", "segunda"
+
+        const problemas = [
+            { op: "8 × 7 =", res: 56 },
+            { op: "6 × 9 =", res: 54 },
+            { op: "12 × 5 =", res: 60 },
+            { op: "7 × 8 =", res: 56 },
+            { op: "9 × 6 =", res: 54 },
+            { op: "11 × 4 =", res: 44 },
+            { op: "8 × 9 =", res: 72 },
+            { op: "7 × 12 =", res: 84 },
+            { op: "13 × 5 =", res: 65 },
+            { op: "6 × 11 =", res: 66 }
+        ];
+
+        let confettiCanvas, ctx, confettiParticles = [];
+        let confettiAnimation;
+
+        function hablar(texto) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(texto);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function initConfetti() {
+            confettiCanvas = document.getElementById('confetti');
+            ctx = confettiCanvas.getContext('2d');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+
+        function createConfettiParticle() {
+            return {
+                x: Math.random() * confettiCanvas.width,
+                y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                size: Math.random() * 12 + 6,
+                speed: Math.random() * 6 + 3,
+                angle: Math.random() * 360,
+                color: ['#00C853', '#FFD700', '#FF5722', '#2196F3', '#E91E63'][Math.floor(Math.random()*5)],
+                rotationSpeed: Math.random() * 0.2 - 0.1
+            };
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            for (let i = 0; i < confettiParticles.length; i++) {
+                const p = confettiParticles[i];
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.angle * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                ctx.restore();
+
+                p.y += p.speed;
+                p.angle += p.rotationSpeed;
+                p.speed += 0.05;
+
+                if (p.y > confettiCanvas.height) confettiParticles.splice(i, 1), i--;
+            }
+        }
+
+        function startConfetti(duration = 2500, amount = 80) {
+            if (!ctx) initConfetti();
+            confettiCanvas.style.display = 'block';
+            confettiParticles = [];
+            for (let i = 0; i < amount; i++) confettiParticles.push(createConfettiParticle());
+
+            let elapsed = 0;
+            const interval = 16;
+            clearInterval(confettiAnimation);
+            confettiAnimation = setInterval(() => {
+                drawConfetti();
+                elapsed += interval;
+                if (elapsed > duration && confettiParticles.length < 15) {
+                    clearInterval(confettiAnimation);
+                    setTimeout(() => confettiCanvas.style.display = 'none', 1000);
+                }
+            }, interval);
+        }
+
+        function todasCompletadas() {
+            return estadoProblemas.every(estado => estado === "segunda");
+        }
+
+        function actualizarSidebar() {
+            const container = document.getElementById('listaProblemas');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const item = document.createElement('div');
+                item.className = 'problema-item';
+                
+                if (estadoProblemas[i] === "segunda") {
+                    item.classList.add('correct');
+                    item.innerHTML = `✅ Problema ${i+1}`;
+                } else if (estadoProblemas[i] === "primera") {
+                    item.classList.add('incorrect');
+                    item.innerHTML = `❌ Problema ${i+1}`;
+                    item.onclick = () => irAProblema(i);
+                } else {
+                    item.innerHTML = `⭕ Problema ${i+1}`;
+                }
+                container.appendChild(item);
+            }
+        }
+
+        function irAProblema(index) {
+            if (estadoProblemas[index] === "segunda") return;
+            problemaActual = index;
+            cargarProblema();
+        }
+
+        function cargarProblema() {
+            const p = problemas[problemaActual];
+            respuestaCorrecta = p.res;
+            seleccionada = null;
+            yaVerificado = false;
+
+            document.getElementById('pregunta').textContent = `¿Cuánto es ${p.op}`;
+            document.getElementById('problemaActual').textContent = problemaActual + 1;
+
+            generarOpciones(p.res);
+            actualizarSidebar();
+        }
+
+        function generarOpciones(res) {
+            const container = document.getElementById('opciones');
+            container.innerHTML = '';
+
+            let opciones = [res];
+            while (opciones.length < 3) {
+                let wrong = res + Math.floor(Math.random() * 25) - 12;
+                if (wrong > 0 && !opciones.includes(wrong)) opciones.push(wrong);
+            }
+            opciones.sort(() => Math.random() - 0.5);
+
+            opciones.forEach(num => {
+                const div = document.createElement('div');
+                div.className = 'opcion';
+                div.textContent = num;
+                div.onclick = () => {
+                    if (yaVerificado) return;
+                    seleccionar(div, num);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function seleccionar(elemento, numero) {
+            document.querySelectorAll('.opcion').forEach(opt => opt.style.borderColor = '#FFD700');
+            elemento.style.borderColor = '#00E676';
+            seleccionada = numero;
+            hablar(String(numero));
+        }
+
+        function verificarRespuesta() {
+            if (seleccionada === null) {
+                hablar("Selecciona una respuesta");
+                return;
+            }
+            if (yaVerificado) return;
+
+            yaVerificado = true;
+            const esCorrecta = seleccionada === respuestaCorrecta;
+            const esSegundoIntento = estadoProblemas[problemaActual] === "primera";
+
+            let puntosAñadir = 0;
+
+            if (esCorrecta) {
+                puntosAñadir = esSegundoIntento ? 5 : 10;
+                estadoProblemas[problemaActual] = "segunda";
+                startConfetti(1800, 120);
+            } else {
+                if (esSegundoIntento) {
+                    estadoProblemas[problemaActual] = "segunda";
+                } else {
+                    estadoProblemas[problemaActual] = "primera";
+                }
+            }
+
+            puntos += puntosAñadir;
+            document.getElementById('puntos').textContent = puntos;
+
+            document.querySelectorAll('.opcion').forEach(opt => {
+                const valor = parseInt(opt.textContent);
+                if (valor === seleccionada) {
+                    opt.classList.add(esCorrecta ? 'correct' : 'incorrect');
+                }
+            });
+
+            if (!esCorrecta && esSegundoIntento) {
+                document.querySelectorAll('.opcion').forEach(opt => {
+                    if (parseInt(opt.textContent) === respuestaCorrecta) opt.classList.add('correct');
+                });
+            }
+
+            if (esCorrecta) {
+                document.getElementById('correctSound').play();
+            } else {
+                document.getElementById('errorSound').play();
+                hablar(esSegundoIntento 
+                    ? "Esa tampoco era correcta. Aquí está la respuesta." 
+                    : "Incorrecto, tienes una segunda oportunidad");
+            }
+
+            actualizarSidebar();
+            document.getElementById('verificarBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+
+            // Verificar si ya terminó todo
+            if (todasCompletadas()) {
+                mostrarBotonLobby();
+            }
+        }
+
+        function mostrarBotonLobby() {
+            if (!todasCompletadas()) return;
+
+            const botonesDiv = document.querySelector('.botones');
+            if (!botonesDiv) return;
+
+            botonesDiv.innerHTML = `
+                <div style="
+                    width:100%;
+                    text-align:center;
+                    color:white;
+                    font-size:2rem;
+                    margin-bottom:20px;
+                ">
+                    🏆 Puntuación Final: <strong>${puntos}</strong>
+                </div>
+
+                <button id="lobbyBtn"
+                    style="
+                        background:#00C853;
+                        color:white;
+                        font-size:1.8rem;
+                        padding:12px 24px;
+                        border-radius:20px;
+                    ">
+                    🏠 Ir al Lobby
+                </button>
+            `;
+
+            const lobbyBtn = document.getElementById('lobbyBtn');
+            if (lobbyBtn) {
+                lobbyBtn.addEventListener('click', () => {
+                    localStorage.setItem('score_multiplicacion', puntos);
+                    window.location.href = 'lobby.html';
+                });
+            }
+
+            startConfetti(5000, 250);
+            hablar('Felicitaciones. Has completado todas las multiplicaciones.');
+        }
+
+    function siguienteProblema() {
+
+    // Si ya completó todo
+    if (todasCompletadas()) {
+        mostrarBotonLobby();
+        return;
+    }
+
+    // =========================
+    // PRIMERA RONDA (1 al 10)
+    // =========================
+    if (!modoRevision) {
+
+        if (problemaActual < problemas.length - 1) {
+
+            problemaActual++;
+
+            resetearParaNuevoProblema();
+            cargarProblema();
+            return;
+        }
+
+        // Llegó al final
+        modoRevision = true;
+
+        const pendiente = estadoProblemas.findIndex(
+            estado => estado !== "segunda"
+        );
+
+        if (pendiente !== -1) {
+
+            hablar(
+                "Ahora revisaremos las preguntas pendientes."
+            );
+
+            problemaActual = pendiente;
+
+            resetearParaNuevoProblema();
+            cargarProblema();
+        }
+
+        return;
+    }
+
+    // =========================
+    // MODO REVISIÓN
+    // =========================
+
+    const siguientePendiente =
+        estadoProblemas.findIndex(
+            (estado, indice) =>
+                indice > problemaActual &&
+                estado !== "segunda"
+        );
+
+    if (siguientePendiente !== -1) {
+
+        problemaActual = siguientePendiente;
+
+        resetearParaNuevoProblema();
+        cargarProblema();
+
+        return;
+    }
+
+    // Buscar cualquiera pendiente restante
+    const pendienteRestante =
+        estadoProblemas.findIndex(
+            estado => estado !== "segunda"
+        );
+
+    if (pendienteRestante !== -1) {
+
+        problemaActual = pendienteRestante;
+
+        resetearParaNuevoProblema();
+        cargarProblema();
+
+        return;
+    }
+
+    // Todo terminado
+    mostrarBotonLobby();
+}
+
+        function resetearParaNuevoProblema() {
+            document.getElementById('verificarBtn').style.display = 'inline-block';
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        window.onload = () => {
+            initConfetti();
+            actualizarSidebar();
+            cargarProblema();
+        };
+
+        window.addEventListener('resize', () => {
+            if (confettiCanvas) {
+                confettiCanvas.width = window.innerWidth;
+                confettiCanvas.height = window.innerHeight;
+            }
+        });
+    </script>
+    <script src="js/profile.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡División Divertida! - 4° Básico</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #a8e6cf, #d0f4de);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 720px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 { color: #ff6b6b; margin-bottom: 10px; font-size: 2.8em; }
+        .subtitle { color: #4ecdc4; margin-bottom: 20px; font-size: 1.3em; }
+        
+        .progress {
+            font-size: 1.5em;
+            background: #ffe66d;
+            padding: 10px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .score {
+            font-size: 1.8em;
+            background: #4ecdc4;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .problem-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.2em;
+            margin: 35px 0;
+            background: #f0f0f0;
+            padding: 25px 40px;
+            border-radius: 20px;
+            gap: 25px;
+            min-height: 120px;
+            flex-wrap: wrap;
+        }
+        
+        .drop-zone {
+            border: 4px dashed #4ecdc4;
+            border-radius: 15px;
+            padding: 18px 35px;
+            min-width: 90px;
+            background: white;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .drop-zone.over {
+            background: #d0f4de;
+            border-color: #51cf66;
+        }
+        
+        .answer-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .option {
+            font-size: 2.3em;
+            padding: 22px 35px;
+            background: #4ecdc4;
+            color: white;
+            border-radius: 20px;
+            cursor: grab;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        
+        .option:active { cursor: grabbing; transform: scale(0.95); }
+        
+        .speaker-btn {
+            background: #ffe66d;
+            border: none;
+            font-size: 1.6em;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 30px;
+        }
+        
+        .verify-btn {
+            background: #ff9ff3;
+            font-size: 1.6em;
+            padding: 15px 60px;
+            border-radius: 50px;
+            margin: 20px 0;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .verify-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .feedback {
+            font-size: 1.8em;
+            margin: 25px 0;
+            min-height: 80px;
+        }
+        
+        .next-btn {
+            background: #51cf66;
+            font-size: 1.5em;
+            padding: 15px 50px;
+            margin-top: 10px;
+            border-radius: 50px;
+            display: none;
+        }
+        
+        canvas#confetti { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 100; }
+    </style>
+</head>
+<body>
+    <div class="user-profile" id="userProfile" style="display:none; position: fixed; top: 15px; right: 15px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #FF6B00;">
+        <p class="user-name" id="userName" style="margin:0; font-weight:bold; font-size:1rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">--</p>
+    </div>
+    <canvas id="confetti"></canvas>
+    
+    <div class="game-container">
+        <h1>🦁 División Divertida 🦁</h1>
+        <p class="subtitle">¡Arrastra la respuesta y verifica!</p>
+        
+        <div class="progress">Problema <span id="current">1</span> de 10</div>
+        <div class="score">Puntos: <span id="score">0</span></div>
+        
+        <div class="problem-area" id="problem-area">
+            <button class="speaker-btn" onclick="speakEquation()" title="Escuchar el problema">🔊</button>
+            
+            <span id="dividend">12</span>
+            <span>÷</span>
+            <span id="divisor">3</span>
+            <span>=</span>
+            <div class="drop-zone" id="drop-zone" 
+                 ondrop="drop(event)" 
+                 ondragover="allowDrop(event)" 
+                 ondragleave="removeOver(event)">?</div>
+        </div>
+        
+        <div class="answer-options" id="options"></div>
+        
+        <button class="verify-btn" id="verifyBtn" onclick="verifyAnswer()" disabled>✅ Verificar Respuesta</button>
+        <button class="next-btn" id="nextBtn" onclick="nextProblem()" style="display:none; margin-left:12px;">¡Siguiente problema! →</button>
+
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        let currentProblemNum = 1;
+        let score = 0;
+        let correctCount = 0;
+        let selectedAnswer = null;
+        let currentCorrect = null;
+        let currentDividend = 0;
+        let currentDivisor = 0;
+
+        const synth = window.speechSynthesis;
+
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.1;
+            synth.speak(utterance);
+        }
+
+        function speakNumber(num) {
+            speak(num.toString());
+        }
+
+        function speakEquation() {
+            const text = `Cuánto es ${currentDividend} dividido por ${currentDivisor}`;
+            speak(text);
+        }
+
+        function generateProblem() {
+            const divisor = Math.floor(Math.random() * 8) + 2;
+            const quotient = Math.floor(Math.random() * 11) + 3;
+            const dividend = divisor * quotient;
+
+            let answers = [quotient];
+            while (answers.length < 4) {
+                let wrong = Math.floor(Math.random() * 20) + 1;
+                if (!answers.includes(wrong)) answers.push(wrong);
+            }
+            answers.sort(() => Math.random() - 0.5);
+
+            return { dividend, divisor, correct: quotient, options: answers };
+        }
+
+        function renderProblem() {
+            // Al renderizar un nuevo problema, detener y limpiar cualquier confeti anterior
+            stopConfetti();
+
+            const problem = generateProblem();
+            currentCorrect = problem.correct;
+            currentDividend = problem.dividend;
+            currentDivisor = problem.divisor;
+            selectedAnswer = null;
+
+            document.getElementById('dividend').textContent = problem.dividend;
+            document.getElementById('divisor').textContent = problem.divisor;
+            
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.innerHTML = '?';
+            dropZone.style.background = 'white';
+
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+
+            problem.options.forEach(ans => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = ans;
+                div.draggable = true;
+                div.ondragstart = (ev) => {
+                    ev.dataTransfer.setData("text", ans);
+                    speakNumber(ans);
+                };
+                div.onclick = () => speakNumber(ans);
+                optionsDiv.appendChild(div);
+            });
+
+            const verifyBtn = document.getElementById('verifyBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            verifyBtn.style.display = 'inline-block';
+            verifyBtn.disabled = true;
+            document.getElementById('feedback').innerHTML = '';
+            nextBtn.style.display = 'none';
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+            document.getElementById('drop-zone').classList.add('over');
+        }
+
+        function removeOver(ev) {
+            document.getElementById('drop-zone').classList.remove('over');
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            selectedAnswer = parseInt(data);
+            
+            const dropZone = document.getElementById('drop-zone');
+            dropZone.innerHTML = selectedAnswer;
+            dropZone.classList.remove('over');
+            
+            document.getElementById('verifyBtn').disabled = false;
+        }
+
+        function verifyAnswer() {
+            if (!selectedAnswer) return;
+
+            const feedback = document.getElementById('feedback');
+            const isCorrect = selectedAnswer === currentCorrect;
+
+            const options = document.querySelectorAll('.option');
+            options.forEach(opt => opt.draggable = false);
+
+            if (isCorrect) {
+                correctCount++;
+                score += 10;
+                feedback.innerHTML = `¡Excelente! 🎉<br>${selectedAnswer} es correcto!`;
+                feedback.style.color = '#51cf66';
+                speak(`¡Muy bien! La respuesta es ${selectedAnswer}`);
+                // Mostrar confeti al responder correctamente
+                launchConfetti(120);
+            } else {
+                feedback.innerHTML = `¡Casi! La respuesta correcta era ${currentCorrect} 😊`;
+                feedback.style.color = '#ff6b6b';
+                speak("Casi, inténtalo otra vez");
+            }
+
+            document.getElementById('score').textContent = score;
+
+            const verifyBtn = document.getElementById('verifyBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            verifyBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+        }
+
+        // Confetti global control (delegado al controlador global)
+        function stopConfetti() {
+            try { if (window.stopConfetti) window.stopConfetti(); } catch(e) {}
+        }
+
+        function launchConfetti(intensity = 150) {
+            try { if (window.startConfetti) window.startConfetti(1500, intensity); } catch(e) {}
+        }
+
+        function nextProblem() {
+            // Al cambiar de pregunta, detener cualquier confeti activo
+            stopConfetti();
+
+            currentProblemNum++;
+            if (currentProblemNum > 10) {
+                endGame();
+                return;
+            }
+            document.getElementById('current').textContent = currentProblemNum;
+            renderProblem();
+        }
+
+        function endGame() {
+            // detener confeti si está activo
+            stopConfetti();
+
+            try {
+                localStorage.setItem('score_dividir', String(score));
+            } catch (e) {
+                console.warn('No se pudo guardar el puntaje de dividir', e);
+            }
+
+            const container = document.querySelector('.game-container');
+            container.innerHTML = `
+                <h1>¡Felicidades! 🎊</h1>
+                <p style="font-size: 2.2em; margin: 30px 0;">Completaste los 10 problemas</p>
+                <p style="font-size: 2.1em;">Puntuación final: <strong>${score}</strong> puntos</p>
+                <p style="font-size: 1.8em;">Correctas: <strong>${correctCount}/10</strong></p>
+                <div style="margin-top:22px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                    <button onclick="location.reload()" style="font-size: 1.6em; padding: 18px 40px; background:#ff9ff3; border:none; border-radius:50px; cursor:pointer;">
+                        Jugar de nuevo
+                    </button>
+                    <button onclick="window.location.href='lobby.html'" style="font-size: 1.6em; padding: 18px 40px; background:#51cf66; border:none; border-radius:50px; cursor:pointer;">
+                        Volver al Lobby
+                    </button>
+                </div>
+            `;
+        }
+
+        window.onload = () => {
+            // Inicializar totalScore si no existe
+            try {
+                if (!localStorage.getItem('totalScore')) localStorage.setItem('totalScore', '0');
+            } catch (e) {
+                console.warn('localStorage no disponible', e);
+            }
+            renderProblem();
+        };
+    </script>
+    <script src="js/profile.js" defer></script>
+</body>
+</html>

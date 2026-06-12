@@ -10,149 +10,389 @@
             font-family: 'Comic Sans MS', cursive, sans-serif;
             background: linear-gradient(to bottom, #FFEBB8, #FFCC80);
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
         }
-        h1 { color: #D32F2F; font-size: 3rem; margin: 15px 0; }
+        h1 { color: #D32F2F; font-size: 2.4rem; margin: 10px 0; }
 
         .score-container {
-            position: fixed; top: 15px; left: 15px; background: white; 
-            padding: 12px 25px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 1.5rem; z-index: 1000;
+            position: fixed; top: 10px; left: 10px; background: white; 
+            padding: 8px 20px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 1.3rem; z-index: 1000;
         }
 
-        .user-profile {
-            position: fixed; top: 15px; right: 15px; background: white; padding: 8px 12px;
-            border-radius: 999px; box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .user-profile img {
-            width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 3px solid #FF6B00;
+        .problemas-container {
+            max-width: 1100px;
+            margin: 25px auto;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
         }
 
-        .problema {
-            background: white; border-radius: 25px; padding: 40px; margin: 30px auto;
-            max-width: 700px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        .problema-card {
+            background: white; 
+            border-radius: 18px; 
+            padding: 18px 12px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+            text-align: center;
+            min-height: 260px;
+            position: relative;
+        }
+
+        .resultado {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
         }
 
         .operacion {
-            font-size: 3.8rem; font-weight: bold; color: #2c3e50; margin: 25px 0;
+            font-size: 2.1rem; 
+            font-weight: bold; 
+            color: #2c3e50; 
+            margin: 12px 0;
         }
 
         .opciones {
-            display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; margin: 30px 0;
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            margin: 12px 0;
         }
 
         .opcion {
-            width: 130px; height: 130px; background: #FF6B00; color: white;
-            border-radius: 20px; display: flex; align-items: center; justify-content: center;
-            font-size: 2.8rem; font-weight: bold; cursor: pointer; box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            width: 72px; 
+            height: 72px; 
+            background: #FF6B00; 
+            color: white;
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             transition: all 0.2s;
         }
-        .opcion:hover { transform: scale(1.12); background: #FF4500; }
+        .opcion:hover { transform: scale(1.1); background: #FF4500; }
 
         .drop-zone {
-            border: 5px dashed #2c3e50; border-radius: 20px; width: 190px; height: 170px;
-            margin: 30px auto; display: flex; align-items: center; justify-content: center;
-            font-size: 4.2rem; font-weight: bold; background: #f8f8f8;
-            transition: all 0.4s;
+            border: 4px dashed #2c3e50; 
+            border-radius: 15px; 
+            width: 125px; 
+            height: 100px;
+            margin: 12px auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-size: 2.4rem; 
+            font-weight: bold; 
+            background: #f8f8f8;
         }
         .drop-zone.correct { border-color: #00C853; background: #E8F5E9; }
         .drop-zone.incorrect { border-color: #e74c3c; background: #fce8e6; }
 
         button {
-            margin: 15px 10px; padding: 16px 45px; font-size: 1.7rem; border: none;
-            border-radius: 50px; cursor: pointer;
+            margin: 15px 10px; 
+            padding: 12px 35px; 
+            font-size: 1.5rem; 
+            border: none;
+            border-radius: 50px; 
+            cursor: pointer;
         }
-        #verificarBtn { background: #1976D2; color: white; }
-        #nextBtn { background: #388E3C; color: white; }
+        #verificarTodoBtn { background: #1976D2; color: white; }
+        #nextBtn { background: #388E3C; color: white; display: none; }
+
+        .problema-speaker {
+            cursor: pointer;
+            font-size: 1.8rem;
+            transition: all 0.2s;
+            margin: 5px 0;
+        }
+
+        .problema-speaker:hover {
+            transform: scale(1.2);
+        }
+
+        /* Modal para ampliar problema */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-contenido {
+            background: white;
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-operacion {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0;
+        }
+
+        .modal-drop-zone {
+            border: 6px dashed #2c3e50;
+            border-radius: 20px;
+            width: 200px;
+            height: 150px;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            background: #f8f8f8;
+            transition: all 0.3s;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .modal-drop-zone.correct {
+            border-color: #00C853;
+            background: #E8F5E9;
+        }
+
+        .modal-drop-zone.incorrect {
+            border-color: #e74c3c;
+            background: #fce8e6;
+        }
+
+        .modal-opciones {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .modal-opcion {
+            width: 100px;
+            height: 100px;
+            background: #FF6B00;
+            color: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+        }
+
+        .modal-opcion:hover {
+            transform: scale(1.1);
+            background: #FF4500;
+        }
+
+        .info-helper {
+            background: #FFF9C4;
+            border: 2px solid #FBC02D;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin: 15px auto;
+            max-width: 600px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .info-helper:hover {
+            background: #FFF59D;
+            transform: scale(1.02);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-verify-btn {
+            background: #1976D2;
+            color: white;
+            padding: 15px 50px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+
+        .modal-verify-btn:hover {
+            background: #1565C0;
+            transform: scale(1.05);
+        }
+
+        canvas#confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
+
+    <div class="user-profile" id="userProfile" style="display:none; position: fixed; top: 15px; right: 15px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #FF6B00;">
+        <p class="user-name" id="userName" style="margin:0; font-weight:bold; font-size:1rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">--</p>
+    </div>
 
     <div class="score-container">
         ⭐ Puntaje: <strong class="score-display">0</strong>
     </div>
 
-    <div class="user-profile" id="userProfile" style="display:none;">
-        <img id="userAvatar" src="" alt="Avatar">
-        <p class="user-name" id="userName">--</p>
-    </div>
-
     <h1>➕➖ Sumas y Restas</h1>
-    <h2 id="nivel">Problema 1 de 8</h2>
+    <h2>10 Ejercicios - 4° Básico</h2>
 
-    <div class="problema">
-        <p style="font-size:1.8rem; margin-bottom:20px;">¿Cuánto es?</p>
-        <div class="operacion" id="operacion"></div>
-        
-        <div class="drop-zone" id="dropZone" ondrop="drop(event)" ondragover="allowDrop(event)">
-            Arrastra aquí
-        </div>
-
-        <div class="opciones" id="opciones"></div>
+    <div class="info-helper" onclick="reproducirAyuda()" title="Haz clic para escuchar">
+        📢 Si se te dificulta leer los ejercicios, puedes darles click para verlos mejor
     </div>
 
-    <!-- BOTONES -->
-    <button id="verificarBtn" onclick="verificarRespuesta()">✅ Verificar</button>
-    <button id="nextBtn" onclick="siguienteProblema()" style="display: none;">▶️ Siguiente →</button>
+    <div class="problemas-container" id="problemasContainer"></div>
 
-    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2702/2702-preview.mp3"></audio>
+    <button id="verificarTodoBtn" onclick="verificarTodo()">✅ Verificar Todos</button>
+    <button id="nextBtn" onclick="irAlLobby()" style="display: none;">▶️ Siguiente →</button>
+
+    <!-- Modal para ampliar problema -->
+    <div class="modal-overlay" id="modalOverlay" onclick="cerrarModal(event)">
+        <div class="modal-contenido" onclick="event.stopPropagation()">
+            <h3 id="modalTitle" style="font-size: 1.5rem; margin-bottom: 10px;">Problema</h3>
+            <div class="problema-speaker" onclick="reproducirProblema(document.getElementById('modalOperacion').textContent)" title="Escuchar" style="font-size: 2.2rem; margin-bottom: 20px;">📢</div>
+            <div class="modal-operacion" id="modalOperacion"></div>
+            <div class="modal-drop-zone" id="modalDropZone" ondrop="dropModal(event)" ondragover="allowDrop(event)">
+                Arrastra
+            </div>
+            <div class="modal-opciones" id="modalOpciones"></div>
+            <button class="modal-verify-btn" onclick="verificarProblemaModal()">✅ Verificar</button>
+        </div>
+    </div>
+
+    <audio id="correctSound" src="https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3"></audio>
     <audio id="errorSound" src="https://assets.mixkit.co/active_storage/sfx/2955/2955-preview.mp3"></audio>
-    <canvas id="confetti" style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:9999; display:none;"></canvas>
-
-    <script src="js/score.js" defer></script>
-    <script src="js/profile.js" defer></script>
+    <canvas id="confetti" style="display: none;"></canvas>
 
     <script>
-        let problemaActual = 0;
-        let respuestaCorrecta = 0;
+        let puntuacionTotal = 0;
+        let problemaActualEnModal = null;
 
         const problemas = [
-            { op: "456 + 278 =", res: 734 },
-            { op: "892 - 345 =", res: 547 },
-            { op: "567 + 389 =", res: 956 },
-            { op: "1234 - 567 =", res: 667 },
-            { op: "678 + 245 =", res: 923 },
-            { op: "1500 - 678 =", res: 822 },
-            { op: "789 + 456 =", res: 1245 },
-            { op: "2000 - 987 =", res: 1013 }
+            { id: 1, op: "456 + 278 =", res: 734 },
+            { id: 2, op: "892 - 345 =", res: 547 },
+            { id: 3, op: "567 + 389 =", res: 956 },
+            { id: 4, op: "1234 - 567 =", res: 667 },
+            { id: 5, op: "678 + 245 =", res: 923 },
+            { id: 6, op: "1500 - 678 =", res: 822 },
+            { id: 7, op: "789 + 456 =", res: 1245 },
+            { id: 8, op: "345 + 678 =", res: 1023 },
+            { id: 9, op: "1256 - 489 =", res: 767 },
+            { id: 10, op: "987 + 654 =", res: 1641 }
         ];
 
-        function hablar(texto) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(texto);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.9;
-                speechSynthesis.speak(utterance);
-            }
-        }
-
-        function cargarProblema() {
-            const p = problemas[problemaActual];
-            respuestaCorrecta = p.res;
-            
-            document.getElementById('nivel').textContent = `Problema ${problemaActual + 1} de 8`;
-            document.getElementById('operacion').textContent = p.op;
-            
-            resetDropZone();
-            document.getElementById('verificarBtn').style.display = 'inline-block';
-            document.getElementById('nextBtn').style.display = 'none';
-
-            generarOpciones();
-        }
-
-        function resetDropZone() {
-            const dropZone = document.getElementById('dropZone');
-            dropZone.innerHTML = 'Arrastra aquí';
-            dropZone.classList.remove('correct', 'incorrect');
-            delete dropZone.dataset.respuesta;
-        }
-
-        function generarOpciones() {
-            const container = document.getElementById('opciones');
+        function generarTodosLosProblemas() {
+            const container = document.getElementById('problemasContainer');
             container.innerHTML = '';
-            
+
+            problemas.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'problema-card';
+                card.id = `card${p.id}`;
+                card.style.cursor = 'pointer';
+                card.innerHTML = `
+                    <h3 style="font-size:1.1rem;">Problema ${p.id}</h3>
+                    <div class="resultado" id="resultado${p.id}"></div>
+                    <div class="problema-speaker" onclick="event.stopPropagation(); reproducirProblema('${p.op}')" title="Escuchar">📢</div>
+                    <div class="operacion">${p.op}</div>
+                    <div class="drop-zone" id="drop${p.id}" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        Arrastra aquí
+                    </div>
+                    <div class="opciones" id="opciones${p.id}"></div>
+                `;
+                
+                card.addEventListener('click', () => abrirModal(p));
+                container.appendChild(card);
+                generarOpcionesParaProblema(p.id, p.res);
+            });
+        }
+
+        function abrirModal(problema) {
+            problemaActualEnModal = problema;
+            document.getElementById('modalTitle').textContent = `Problema ${problema.id}`;
+            document.getElementById('modalOperacion').textContent = problema.op;
+            document.getElementById('modalDropZone').innerHTML = 'Arrastra aquí';
+            document.getElementById('modalDropZone').dataset.respuesta = '';
+            document.getElementById('modalDropZone').classList.remove('correct', 'incorrect');
+
+            const opcionsContainer = document.getElementById('modalOpciones');
+            opcionsContainer.innerHTML = '';
+
+            let opciones = [problema.res];
+            while (opciones.length < 4) {
+                let wrong = problema.res + Math.floor(Math.random() * 90) - 45;
+                if (!opciones.includes(wrong)) opciones.push(wrong);
+            }
+            opciones.sort(() => Math.random() - 0.5);
+
+            opciones.forEach(num => {
+                const div = document.createElement('div');
+                div.className = 'modal-opcion';
+                div.draggable = true;
+                div.textContent = num;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    reproducirNumero(num);
+                };
+                div.ondragstart = (e) => e.dataTransfer.setData("text", num);
+                opcionsContainer.appendChild(div);
+            });
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function cerrarModal(event) {
+            if (event && event.target.id !== 'modalOverlay') return;
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function dropModal(ev) {
+            ev.preventDefault();
+            const num = parseInt(ev.dataTransfer.getData("text"));
+            const dropZone = ev.target;
+            dropZone.innerHTML = num;
+            dropZone.dataset.respuesta = num;
+
+            // Actualizar tarjeta principal sin verificar
+            const cardDropZone = document.getElementById(`drop${problemaActualEnModal.id}`);
+            cardDropZone.innerHTML = num;
+            cardDropZone.dataset.respuesta = num;
+        }
+
+        function generarOpcionesParaProblema(id, respuestaCorrecta) {
+            const container = document.getElementById(`opciones${id}`);
+            container.innerHTML = '';
+
             let opciones = [respuestaCorrecta];
             while (opciones.length < 4) {
                 let wrong = respuestaCorrecta + Math.floor(Math.random() * 90) - 45;
@@ -165,8 +405,11 @@
                 div.className = 'opcion';
                 div.draggable = true;
                 div.textContent = num;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    reproducirNumero(num);
+                };
                 div.ondragstart = (e) => e.dataTransfer.setData("text", num);
-                div.addEventListener('click', () => hablar(num.toString()));
                 container.appendChild(div);
             });
         }
@@ -176,85 +419,259 @@
         function drop(ev) {
             ev.preventDefault();
             const num = parseInt(ev.dataTransfer.getData("text"));
-            const dropZone = document.getElementById('dropZone');
+            const dropZone = ev.target;
             dropZone.innerHTML = num;
             dropZone.dataset.respuesta = num;
         }
 
-        function verificarRespuesta() {
-            const dropZone = document.getElementById('dropZone');
-            const respuesta = parseInt(dropZone.dataset.respuesta);
+        function verificarTodo() {
+            let correctos = 0;
 
-            if (isNaN(respuesta)) {
-                alert("¡Arrastra un número primero!");
-                return;
+            problemas.forEach(p => {
+                const dropZone = document.getElementById(`drop${p.id}`);
+                const resultadoDiv = document.getElementById(`resultado${p.id}`);
+                const respuesta = parseInt(dropZone.dataset.respuesta);
+
+                if (!isNaN(respuesta)) {
+                    if (respuesta === p.res) {
+                        dropZone.classList.add('correct');
+                        resultadoDiv.innerHTML = '✅';
+                        resultadoDiv.style.color = '#00C853';
+                        correctos++;
+                    } else {
+                        dropZone.classList.add('incorrect');
+                        resultadoDiv.innerHTML = '❌';
+                        resultadoDiv.style.color = '#e74c3c';
+                    }
+                } else {
+                    resultadoDiv.innerHTML = '❓';
+                    resultadoDiv.style.color = '#FF9800';
+                }
+            });
+
+            puntuacionTotal = correctos * 10;
+            document.querySelector('.score-display').textContent = puntuacionTotal;
+            try {
+                localStorage.setItem('score_sumas_resta', String(puntuacionTotal));
+            } catch (e) {
+                console.warn('No se pudo guardar el puntaje de sumas y restas', e);
             }
 
-            if (respuesta === respuestaCorrecta) {
-                document.getElementById('correctSound').play();
-                dropZone.classList.add('correct');
-                addPoints(20);
-                mostrarConfeti();
+            // Mostrar botón Siguiente
+            document.getElementById('verificarTodoBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
 
-                document.getElementById('verificarBtn').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'inline-block';
+            if (correctos === problemas.length) {
+                document.getElementById('correctSound').play();
             } else {
                 document.getElementById('errorSound').play();
-                dropZone.classList.add('incorrect');
-                setTimeout(() => dropZone.classList.remove('incorrect'), 1600);
             }
         }
 
-        function mostrarConfeti() {
-            const canvas = document.getElementById('confetti');
-            canvas.style.display = 'block';
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        function irAlLobby() {
+            // Aquí puedes cambiar la URL por tu página real de lobby
+            window.location.href = 'lobby.html';
+        }
 
-            let particles = [];
-            for (let i = 0; i < 280; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    size: Math.random() * 14 + 8,
-                    speed: Math.random() * 11 + 7,
-                    color: `hsl(${Math.random()*360}, 90%, 65%)`,
-                    rotation: Math.random() * 360,
-                    rs: Math.random() * 15 - 7
-                });
+        function reproducirNumero(num) {
+            const synth = window.speechSynthesis;
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(String(num));
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
+
+        function reproducirProblema(texto) {
+            const synth = window.speechSynthesis;
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(texto);
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.9;
+            synth.speak(utterance);
+        }
+
+        function reproducirAyuda() {
+            const synth = window.speechSynthesis;
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance('Si se te dificulta leer los ejercicios, puedes darles click para verlos mejor');
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.95;
+            synth.speak(utterance);
+        }
+
+        function verificarProblemaModal() {
+            const dropZone = document.getElementById('modalDropZone');
+            const respuesta = parseInt(dropZone.dataset.respuesta);
+
+            if (isNaN(respuesta)) {
+                reproducirProblema('Primero coloca una alternativa');
+                return;
             }
 
+            const esCorrecta = respuesta === problemaActualEnModal.res;
+
+            if (esCorrecta) {
+                dropZone.classList.add('correct');
+                dropZone.classList.remove('incorrect');
+                document.getElementById('correctSound').play();
+                
+                // Actualizar tarjeta principal
+                const cardDropZone = document.getElementById(`drop${problemaActualEnModal.id}`);
+                cardDropZone.innerHTML = respuesta;
+                cardDropZone.dataset.respuesta = respuesta;
+                
+                const resultadoDiv = document.getElementById(`resultado${problemaActualEnModal.id}`);
+                resultadoDiv.innerHTML = '✅';
+                resultadoDiv.style.color = '#00C853';
+                
+                // Lanzar confeti
+                startConfetti();
+                
+                // Verificar si todos están completos
+                verificarCompletados();
+                
+                // Cerrar modal después de 2 segundos
+                setTimeout(() => {
+                    cerrarModal({ target: { id: 'modalOverlay' } });
+                }, 2000);
+            } else {
+                dropZone.classList.add('incorrect');
+                dropZone.classList.remove('correct');
+                document.getElementById('errorSound').play();
+            }
+        }
+
+        function verificarCompletados() {
+            let completados = 0;
+            
+            problemas.forEach(p => {
+                const dropZone = document.getElementById(`drop${p.id}`);
+                const respuesta = parseInt(dropZone.dataset.respuesta);
+                if (!isNaN(respuesta) && respuesta === p.res) {
+                    completados++;
+                }
+            });
+
+            puntuacionTotal = completados * 10;
+            document.querySelector('.score-display').textContent = puntuacionTotal;
+            
+            if (completados === problemas.length) {
+                try {
+                    localStorage.setItem('score_sumas_resta', String(puntuacionTotal));
+                } catch (e) {
+                    console.warn('No se pudo guardar el puntaje de sumas y restas', e);
+                }
+                document.getElementById('nextBtn').style.display = 'inline-block';
+            }
+        }
+
+        function verificarTodo() {
+            let correctos = 0;
+
+            problemas.forEach(p => {
+                const dropZone = document.getElementById(`drop${p.id}`);
+                const resultadoDiv = document.getElementById(`resultado${p.id}`);
+                const respuesta = parseInt(dropZone.dataset.respuesta);
+
+                if (!isNaN(respuesta)) {
+                    if (respuesta === p.res) {
+                        dropZone.classList.add('correct');
+                        resultadoDiv.innerHTML = '✅';
+                        resultadoDiv.style.color = '#00C853';
+                        correctos++;
+                    } else {
+                        dropZone.classList.add('incorrect');
+                        resultadoDiv.innerHTML = '❌';
+                        resultadoDiv.style.color = '#e74c3c';
+                    }
+                } else {
+                    resultadoDiv.innerHTML = '❓';
+                    resultadoDiv.style.color = '#FF9800';
+                }
+            });
+
+            puntuacionTotal = correctos * 10;
+            document.querySelector('.score-display').textContent = puntuacionTotal;
+            try {
+                localStorage.setItem('score_sumas_resta', String(puntuacionTotal));
+            } catch (e) {
+                console.warn('No se pudo guardar el puntaje de sumas y restas', e);
+            }
+
+            // Mostrar botón Siguiente
+            document.getElementById('verificarTodoBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+
+            if (correctos === problemas.length) {
+                document.getElementById('correctSound').play();
+            } else {
+                document.getElementById('errorSound').play();
+            }
+        }
+
+        function startConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.style.display = 'block';
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            let particles = [];
+            const colors = ['#FF6B00', '#FFD700', '#00C853', '#2196F3', '#E91E63'];
+            
+            for (let i = 0; i < 200; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height * 0.3,
+                    size: Math.random() * 15 + 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedX: Math.random() * 7 - 3.5,
+                    speedY: Math.random() * 9 + 6,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 15 - 7.5,
+                    alpha: 1,
+                    gravity: 0.2
+                });
+            }
+            
+            let frame = 0;
             function animate() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 let alive = false;
-                particles.forEach((p, i) => {
-                    p.y += p.speed;
-                    p.rotation += p.rs;
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    ctx.rotate(p.rotation * Math.PI / 180);
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-                    ctx.restore();
-                    if (p.y < canvas.height + 100) alive = true;
-                });
-                if (alive) requestAnimationFrame(animate);
-                else canvas.style.display = 'none';
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.speedY += p.gravity;
+                    p.rotation += p.rotationSpeed;
+                    p.alpha -= 0.008;
+
+                    if (p.alpha > 0.05) {
+                        alive = true;
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                        ctx.restore();
+                    }
+                }
+
+                if (alive && frame++ < 150) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    canvas.style.display = 'none';
+                }
             }
             animate();
         }
 
-        function siguienteProblema() {
-            if (problemaActual < problemas.length - 1) {
-                problemaActual++;
-                cargarProblema();
-            } else {
-                window.location.href = 'juego3.html';
-            }
-        }
-
-        window.onload = cargarProblema;
+        window.onload = generarTodosLosProblemas;
     </script>
+    <script src="js/profile.js" defer></script>
 </body>
 </html>

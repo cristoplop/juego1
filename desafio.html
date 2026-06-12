@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Matemáticas Rápidas - 4° Básico</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .game-container {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 { color: #ff6b6b; font-size: 2.6em; margin-bottom: 8px; }
+        .subtitle { color: #4ecdc4; font-size: 1.4em; margin-bottom: 20px; }
+        
+        .progress { font-size: 1.5em; background: #ffe66d; padding: 10px 25px; border-radius: 50px; display: inline-block; margin-bottom: 10px; }
+        .score { font-size: 1.8em; background: #4ecdc4; color: white; padding: 12px 30px; border-radius: 50px; display: inline-block; margin-bottom: 15px; font-weight: bold; }
+        
+        .timer-bar {
+            height: 12px;
+            background: #ddd;
+            border-radius: 10px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .timer-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #51cf66, #ffe66d);
+            width: 100%;
+            transition: width 0.2s linear;
+        }
+        
+        .problem {
+            font-size: 3.2em;
+            margin: 30px 0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            border-radius: 20px;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin: 30px 0;
+        }
+        
+        .option {
+            font-size: 2.2em;
+            padding: 25px;
+            background: #4ecdc4;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        
+        .option:hover { transform: scale(1.05); }
+        .option:active { transform: scale(0.95); }
+        
+        .feedback {
+            font-size: 2em;
+            margin: 25px 0;
+            min-height: 80px;
+        }
+        
+        .next-btn {
+            background: #51cf66;
+            font-size: 1.6em;
+            padding: 15px 50px;
+            border-radius: 50px;
+            display: none;
+            margin: 15px auto;
+            border: none;
+            cursor: pointer;
+        }
+
+        .end-buttons button {
+            font-size: 1.7em;
+            padding: 18px 50px;
+            margin: 15px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+        
+        canvas#confetti { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            pointer-events: none; 
+            z-index: 100; 
+        }
+    </style>
+</head>
+<body>
+    <div class="user-profile" id="userProfile" style="display:none; position: fixed; top: 15px; right: 15px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #FF6B00;">
+        <p class="user-name" id="userName" style="margin:0; font-weight:bold; font-size:1rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">--</p>
+    </div>
+    <canvas id="confetti"></canvas>
+    
+    <div class="game-container">
+        <h1>⚡ Matemáticas Rápidas ⚡</h1>
+        <p class="subtitle">¡Responde rápido! (4° Básico - Chile)</p>
+        
+        <div class="progress">Pregunta <span id="current">1</span> de 10</div>
+        <div class="score">Puntos: <span id="score">0</span></div>
+        
+        <div class="timer-bar">
+            <div class="timer-progress" id="timerProgress"></div>
+        </div>
+        
+        <div class="problem" id="problem"></div>
+        
+        <div class="options" id="options"></div>
+        
+        <button class="next-btn" id="nextBtn" onclick="nextQuestion()">¡Siguiente Pregunta! →</button>
+        
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let score = 0;
+        let timerInterval;
+        let currentCorrect = null;
+
+        const synth = window.speechSynthesis;
+
+        function speak(text) {
+            if (synth.speaking) synth.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.95;
+            utterance.pitch = 1.05;
+            synth.speak(utterance);
+        }
+
+        function generateQuestion() {
+            const type = Math.floor(Math.random() * 5);
+            let problemText = '';
+            let correct = 0;
+            let options = [];
+
+            switch(type) {
+                case 0: // Suma
+                    const a1 = Math.floor(Math.random() * 700) + 100;
+                    const b1 = Math.floor(Math.random() * 700) + 100;
+                    correct = a1 + b1;
+                    problemText = `${a1} + ${b1} = ?`;
+                    options = [correct, correct + 10, correct - 10, correct + 100];
+                    break;
+
+                case 1: // Resta
+                    const a2 = Math.floor(Math.random() * 900) + 400;
+                    const b2 = Math.floor(Math.random() * 300) + 100;
+                    correct = a2 - b2;
+                    problemText = `${a2} - ${b2} = ?`;
+                    options = [correct, correct + 20, correct - 20, correct + 50];
+                    break;
+
+                case 2: // Multiplicación
+                    const a3 = Math.floor(Math.random() * 12) + 2;
+                    const b3 = Math.floor(Math.random() * 12) + 2;
+                    correct = a3 * b3;
+                    problemText = `${a3} × ${b3} = ?`;
+                    options = [correct, correct + 5, a3 * (b3 + 1), (a3 + 1) * b3];
+                    break;
+
+                case 3: // División
+                    const divisor = Math.floor(Math.random() * 9) + 2;
+                    const quotient = Math.floor(Math.random() * 12) + 3;
+                    const dividend = divisor * quotient;
+                    correct = quotient;
+                    problemText = `${dividend} ÷ ${divisor} = ?`;
+                    options = [correct, correct + 1, correct - 1, correct + divisor];
+                    break;
+
+                case 4: // ¿Cuál es mayor?
+                    let num1 = Math.floor(Math.random() * 8500) + 1500;
+                    let num2 = Math.floor(Math.random() * 8500) + 1500;
+                    if (num1 === num2) num2 += 50;
+                    correct = Math.max(num1, num2);
+                    problemText = `¿Cuál es mayor?<br>${num1} o ${num2}`;
+                    options = [num1, num2, correct + 100, Math.min(num1, num2) - 50];
+                    break;
+            }
+
+            if (!options.includes(correct)) options[0] = correct;
+
+            options = [...new Set(options)];
+            while (options.length < 4) {
+                let distractor = correct + Math.floor(Math.random() * 80) - 40;
+                if (!options.includes(distractor) && distractor > 0) options.push(distractor);
+            }
+            options = options.slice(0, 4);
+            options.sort(() => Math.random() - 0.5);
+
+            return { problemText, correct, options };
+        }
+
+        function startTimer() {
+            let timeLeft = 20;
+            document.getElementById('timerProgress').style.width = '100%';
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.2;
+                const percentage = Math.max(0, (timeLeft / 20) * 100);
+                document.getElementById('timerProgress').style.width = `${percentage}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeExpired();
+                }
+            }, 200);
+        }
+
+        function timeExpired() {
+            document.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
+            const feedback = document.getElementById('feedback');
+            feedback.innerHTML = `⏰ ¡Se acabó el tiempo!<br>La respuesta era: <strong>${currentCorrect}</strong>`;
+            feedback.style.color = '#ff6b6b';
+            speak('Tienes que responder más rápido');
+            endQuestion();
+        }
+
+        function renderQuestion() {
+            const q = generateQuestion();
+            currentCorrect = q.correct;
+            
+            document.getElementById('problem').innerHTML = q.problemText;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            
+            q.options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'option';
+                btn.textContent = opt;
+                btn.onclick = () => checkAnswer(opt);
+                optionsDiv.appendChild(btn);
+            });
+            
+            document.getElementById('feedback').innerHTML = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            
+            speak(q.problemText.replace(/<br>/g, ' '));
+            startTimer();
+        }
+
+        function checkAnswer(selected) {
+            clearInterval(timerInterval);
+            const feedback = document.getElementById('feedback');
+            const isCorrect = selected == currentCorrect;
+            
+            document.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (isCorrect) {
+                score += 10;
+                document.getElementById('score').textContent = score;
+                feedback.innerHTML = `¡Correcto! 🎉<br>+10 puntos`;
+                feedback.style.color = '#51cf66';
+                speak("¡Muy bien!");
+                launchConfetti();
+            } else {
+                feedback.innerHTML = `¡Casi! La respuesta correcta era:<br><strong>${currentCorrect}</strong>`;
+                feedback.style.color = '#ff6b6b';
+                speak("La respuesta correcta es " + currentCorrect);
+            }
+            
+            endQuestion();
+        }
+
+        function endQuestion() {
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion > 10) {
+                endGame();
+                return;
+            }
+            document.getElementById('current').textContent = currentQuestion;
+            renderQuestion();
+        }
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            let particles = [];
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#51cf66', '#ff9ff3'];
+            
+            for (let i = 0; i < 180; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height * 0.4,
+                    size: Math.random() * 13 + 7,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speedX: Math.random() * 6 - 3,
+                    speedY: Math.random() * 8 + 7,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 12 - 6,
+                    alpha: 1,
+                    gravity: 0.18
+                });
+            }
+            
+            let frame = 0;
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    p.speedY += p.gravity;
+                    p.rotation += p.rotationSpeed;
+                    p.alpha -= 0.0075;
+
+                    if (p.alpha > 0.05) {
+                        alive = true;
+                        ctx.save();
+                        ctx.globalAlpha = p.alpha;
+                        ctx.translate(p.x, p.y);
+                        ctx.rotate(p.rotation * Math.PI / 180);
+                        ctx.fillStyle = p.color;
+                        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                        ctx.restore();
+                    }
+                }
+
+                if (alive && frame++ < 130) {
+                    requestAnimationFrame(animate);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            animate();
+        }
+
+        function endGame() {
+            const totalScore = parseInt(localStorage.getItem('score_desafio') || '0') + score;
+            localStorage.setItem('score_desafio', totalScore);
+            
+            const container = document.querySelector('.game-container');
+            container.innerHTML = `
+                <h1>¡Felicidades! 🎊</h1>
+                <p style="font-size: 2.4em; margin: 40px 0;">¡Completaste las 10 preguntas!</p>
+                <p style="font-size: 2.3em;">Puntos esta partida: <strong>${score}</strong></p>
+                <p style="font-size: 1.8em; color: #4ecdc4;">Total acumulado: <strong>${totalScore}</strong></p>
+                
+                <div class="end-buttons">
+                    <button onclick="window.location.href='lobby.html'" style="background:#ff9ff3; color:#333;">
+                        ← Volver al Lobby
+                    </button>
+                    <button onclick="location.reload()" style="background:#1976D2; color:white;">
+                        Jugar de nuevo
+                    </button>
+                </div>
+            `;
+        }
+
+        window.onload = renderQuestion;
+    </script>
+    <script src="js/profile.js" defer></script>
+</body>
+</html>

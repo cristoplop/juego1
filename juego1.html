@@ -223,8 +223,8 @@
 
         <button id="nextBtn" onclick="siguiente()">Siguiente →</button>
 
-        <button id="btnActividad3" onclick="window.location.href='actividad3.html'">
-            ← Volver a Actividad 3
+        <button id="btnActividad3" onclick="window.location.href='actividad2.html'">
+            ← Volver a practicar
         </button>
     </div>
 
@@ -378,48 +378,7 @@
         }
 
         function mostrarConfeti() {
-            const canvas = document.getElementById('confetti');
-            canvas.style.display = 'block';
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            let particles = [];
-            for (let i = 0; i < 180; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    size: Math.random() * 13 + 8,
-                    speed: Math.random() * 9 + 5,
-                    color: `hsl(${Math.random()*360}, 90%, 65%)`,
-                    rotation: Math.random() * 360
-                });
-            }
-
-            let frame = 0;
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                let alive = false;
-                particles.forEach((p, i) => {
-                    p.y += p.speed;
-                    p.rotation += 11;
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    ctx.rotate(p.rotation * Math.PI / 180);
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
-                    ctx.restore();
-                    if (p.y < canvas.height + 120) alive = true;
-                });
-
-                if (alive && frame < 140) {
-                    frame++;
-                    requestAnimationFrame(animate);
-                } else {
-                    canvas.style.display = 'none';
-                }
-            }
-            animate();
+            try { if (window.startConfetti) { window.startConfetti(1500, 180); return; } } catch(e) {}
         }
 
         function siguiente() {

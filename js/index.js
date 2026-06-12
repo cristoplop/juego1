@@ -27,7 +27,10 @@ class Particle {
 
 function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 
-function launchConfetti(duration = 3200) { resizeCanvas(); particles = Array.from({length: 300}, () => new Particle()); try { confettiSound.currentTime = 0; confettiSound.play().catch(()=>{}); } catch(e){} const start = Date.now(); function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(let i=particles.length-1;i>=0;i--){ particles[i].update(); particles[i].draw(); if(particles[i].y>canvas.height) particles.splice(i,1); } if(Date.now()-start<duration && particles.length>0) requestAnimationFrame(animate); } animate(); }
+function launchConfetti(duration = 3200) {
+    try { if (window.startConfetti) window.startConfetti(duration); } catch(e) {}
+    try { confettiSound.currentTime = 0; confettiSound.play().catch(()=>{}); } catch(e){}
+}
 
 function seleccionarAvatar(elemento, avatar){
     // Guardar la URL real de la imagen seleccionada (src del elemento) para usarla en la bienvenida

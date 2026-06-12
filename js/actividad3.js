@@ -73,26 +73,8 @@ class Particle{
 }
 
 function launchConfetti(intensity = 200){
-    resizeCanvas();
-    const particles = Array.from({length: intensity}, () => new Particle());
-    const start = Date.now();
-
-    function animate(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        for(let i = particles.length - 1; i >= 0; i--){
-            particles[i].update();
-            particles[i].draw();
-            if(particles[i].y > canvas.height + 50){
-                particles.splice(i, 1);
-            }
-        }
-        
-        if(Date.now() - start < 2800 && particles.length > 0){
-            requestAnimationFrame(animate);
-        }
-    }
-    animate();
+    try { if (window.startConfetti) window.startConfetti(1500, intensity); }
+    catch(e){}
 }
 
 // ==================== VOZ ====================

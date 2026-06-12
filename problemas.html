@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Rekenpuzzel - Plussommen tot 20</title>
+<style>
+    body {
+        font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive;
+        background: linear-gradient(#f8e1e1, #ffebee);
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+    }
+    h1 { font-size: 3.2em; color: #b71c1c; margin-bottom: 5px; text-shadow: 3px 3px 6px rgba(0,0,0,0.1); }
+    .subtitle { font-size: 1.6em; color: #c62828; margin-bottom: 20px; }
+    .container {
+        display: inline-block;
+        background: white;
+        padding: 30px 40px;
+        border: 14px solid #b71c1c;
+        border-radius: 30px;
+        box-shadow: 0 20px 40px rgba(183, 28, 28, 0.3);
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(13, 52px);
+        gap: 4px;
+        background: #333;
+        padding: 12px;
+        border-radius: 15px;
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+    }
+    .cell {
+        width: 52px; height: 52px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.85em; font-weight: bold;
+        background: white;
+        border: 3px solid #b71c1c;
+        border-radius: 10px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+    }
+    .fixed { background: #ffffff; color: #000000; cursor: default; }
+    input {
+        width: 46px; height: 46px;
+        text-align: center; font-size: 1.5em; font-weight: bold;
+        border: 2px solid #4caf50;
+        background: #99ac44;
+        border-radius: 8px;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+        color: #000000;
+    }
+    button {
+        margin: 25px 12px; padding: 14px 32px; font-size: 1.5em;
+        background: #d32f2f; color: white; border: none;
+        border-radius: 25px; cursor: pointer;
+    }
+    button:hover { background: #000000; }
+    .feedback { 
+        font-size: 2em; 
+        min-height: 80px; 
+        margin: 20px; 
+        font-weight: bold; 
+    }
+    .score { font-size: 2.2em; color: #2e7d32; margin: 15px 0; }
+    #confetti {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        display: none;
+    }
+</style>
+</head>
+<body>
+    <div class="user-profile" id="userProfile" style="display:none; position: fixed; top: 15px; right: 15px; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 8px 25px rgba(0,0,0,0.12); z-index: 1000;">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar del usuario" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #FF6B00;">
+        <p class="user-name" id="userName" style="margin:0; font-weight:bold; font-size:1rem; color:#333; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">--</p>
+    </div>
+    <canvas id="confetti"></canvas>
+    <h1>Rekenpuzzel</h1>
+    <div class="subtitle">Plussommen tot 20</div>
+
+    <div class="container">
+        <div class="grid" id="grid"></div>
+    </div>
+
+    <br>
+    <button onclick="checkAnswers()">✅ Revisar respuestas</button>
+    <div class="feedback" id="feedback"></div>
+    <div class="score" id="score"></div>
+    <div class="score" id="score"></div>
+    <div id="nextButtonContainer"></div>
+<script>
+// === CONFIGURACIÓN DE VOZ ===
+const speak = (text) => {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = 0.95;
+        utterance.pitch = 1.05;
+        utterance.volume = 1;
+        speechSynthesis.speak(utterance);
+    }
+};
+
+const layout = [
+    [null, '+', 5, '=', null, '+', 6, '=', null, '=', 4, '*', null],
+    ['+', '', '-', '', '', '', '', '', '=', '', '-', '', '+'],
+    [9, '=', null, '+', null, '', null, '+', 9, '=', null, '', 8],
+    ['=', '', '=', '', '', '', '', null, '+', 7, '=', 12, '='],
+    [14, '=', 4, '+', null, '=', 14, '=', 7, '+', null, '', 12],
+    ['=', '', '=', '', '-', '', '', '', '=', 9, '=', '', '='],
+    [10, '-', null, '=', 7, '-', null, '=', 3, '', null, '', 3],
+    ['+', '', '-', '', '=', '', '', '', '+', '', '+', '', '*'],
+    [null, '+', 7, '+', null, '=', 14, '=', null, '+', 6, '+', null]
+];
+
+// RESPUESTAS EXACTAS DE LA FOTO
+const correctAnswers = {
+    "0-0": 5,
+    "0-4": 10,
+    "0-8": 16,
+    "0-12": 4,
+
+    "2-2": 1,
+    "2-4": 8,
+    "2-6": 2,
+    "2-8": 9,
+    "2-10": 11,
+
+    "3-7": 5,
+
+    "4-4": 10,
+    "4-10": 7,
+
+    "6-2": 3,
+    "6-6": 4,
+    "6-10": 1,
+    "6-12": 3,
+
+    "8-0": 4,
+    "8-4": 3,
+    "8-8": 4,
+    "8-12": 4
+};
+
+let inputElements = {};
+
+function createGrid() {
+    const container = document.getElementById('grid');
+    container.innerHTML = '';
+    inputElements = {};
+
+    for (let r = 0; r < layout.length; r++) {
+        for (let c = 0; c < layout[r].length; c++) {
+
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+
+            const val = layout[r][c];
+
+            if (val === null) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 2;
+
+                input.dataset.row = r;
+                input.dataset.col = c;
+
+                input.oninput = (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, '');
+                };
+
+                cell.appendChild(input);
+                inputElements[`${r}-${c}`] = input;
+
+            } else {
+                cell.classList.add('fixed');
+                cell.textContent = val;
+            }
+
+            container.appendChild(cell);
+        }
+    }
+}
+
+function resizeConfettiCanvas() {
+    const canvas = document.getElementById('confetti');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+let confettiParticles = [];
+let confettiAnimationId = null;
+
+function createConfettiParticles() {
+    const colors = ['#d32f2f', '#ffeb3b', '#4caf50', '#2196f3', '#9c27b0'];
+    confettiParticles = [];
+
+    for (let i = 0; i < 120; i++) {
+        confettiParticles.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * -window.innerHeight,
+            r: Math.random() * 7 + 4,
+            d: Math.random() * 20 + 10,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 10 - 10,
+            tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+            tiltAngle: 0
+        });
+    }
+}
+
+function drawConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    confettiParticles.forEach(p => {
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+        ctx.stroke();
+    });
+}
+
+function updateConfetti() {
+    confettiParticles.forEach(p => {
+        p.tiltAngle += p.tiltAngleIncrement;
+        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+        p.tilt = Math.sin(p.tiltAngle) * 15;
+
+        if (p.y > window.innerHeight) {
+            p.y = -10;
+            p.x = Math.random() * window.innerWidth;
+        }
+    });
+}
+
+function animateConfetti() {
+    drawConfetti();
+    updateConfetti();
+    confettiAnimationId = requestAnimationFrame(animateConfetti);
+}
+
+function startConfetti() {
+    const canvas = document.getElementById('confetti');
+    canvas.style.display = 'block';
+    resizeConfettiCanvas();
+    createConfettiParticles();
+    if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+    animateConfetti();
+    setTimeout(stopConfetti, 3000);
+}
+
+function stopConfetti() {
+    const canvas = document.getElementById('confetti');
+    if (confettiAnimationId) cancelAnimationFrame(confettiAnimationId);
+    confettiAnimationId = null;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.style.display = 'none';
+}
+
+function allFieldsFilled() {
+    return Object.values(inputElements).every(
+        input => input.value.trim() !== ''
+    );
+}
+
+function checkAnswers() {
+
+    const feedback = document.getElementById('feedback');
+    const scoreEl = document.getElementById('score');
+    const nextContainer = document.getElementById('nextButtonContainer');
+
+    feedback.innerHTML = '';
+    scoreEl.innerHTML = '';
+    nextContainer.innerHTML = '';
+
+    Object.values(inputElements).forEach(input => {
+        input.style.borderColor = '#4caf50';
+        input.style.backgroundColor = '#99ac44';
+    });
+
+    if (!allFieldsFilled()) {
+
+        feedback.innerHTML =
+            "⚠️ <strong>Por favor, rellena TODAS las casillas con números</strong>";
+
+        feedback.style.color = "#d32f2f";
+
+        speak("Por favor rellena todas las casillas con un número");
+
+        return;
+    }
+
+    let correctCount = 0;
+
+    for (const key in correctAnswers) {
+
+        const input = inputElements[key];
+
+        if (!input) continue;
+
+        const userValue = parseInt(input.value);
+        const correctValue = correctAnswers[key];
+
+        if (userValue === correctValue) {
+
+            input.style.borderColor = '#2e7d32';
+            input.style.backgroundColor = '#c8e6c9';
+
+            correctCount++;
+
+        } else {
+
+            input.style.borderColor = '#d32f2f';
+            input.style.backgroundColor = '#ffcdd2';
+        }
+
+        input.disabled = true;
+    }
+
+    const totalInputs = Object.keys(correctAnswers).length;
+    const score = correctCount * 5;
+    const percentage = Math.round((correctCount / totalInputs) * 100);
+
+    localStorage.setItem('score_problemas', score.toString());
+
+    const btn = document.createElement('button');
+    btn.innerHTML = '➡️ Volver al Lobby';
+    btn.style.background = '#2e7d32';
+    btn.style.marginTop = '20px';
+    btn.style.fontSize = '1.6em';
+    btn.onclick = () => {
+        window.location.href = 'lobby.html';
+    };
+
+    if (correctCount === totalInputs) {
+
+        feedback.innerHTML =
+            "🎉 ¡Perfecto! Todas las respuestas son correctas 🎉";
+
+        feedback.style.color = "#2e7d32";
+
+        scoreEl.innerHTML =
+            `🏆 Puntuación Final: <strong>${score}</strong> puntos (${percentage}%)`;
+
+        speak(`¡Excelente! Tuviste ${correctCount} respuestas buenas de ${totalInputs}. Has completado el ejercicio correctamente.`);
+        startConfetti();
+
+        nextContainer.appendChild(btn);
+
+    } else {
+
+        feedback.innerHTML =
+            `✅ Acertaste <strong>${correctCount}</strong> de ${totalInputs} casillas`;
+
+        feedback.style.color = "#f57c00";
+
+        scoreEl.innerHTML =
+            `Puntuación: <strong>${score}</strong> puntos (${percentage}%)`;
+
+        startConfetti();
+
+        if (correctCount === 0) {
+            speak(`Tuviste 0 respuestas buenas de ${totalInputs}. No te rindas, intenta de nuevo con más cuidado.`);
+        } else if (correctCount === 1) {
+            speak(`Tuviste 1 respuesta buena de ${totalInputs}. No te rindas, intenta de nuevo con más cuidado.`);
+        } else if (percentage >= 80) {
+            speak(`Tuviste ${correctCount} respuestas buenas de ${totalInputs}. Muy bien, acertaste muchas respuestas. Sigue así.`);
+        } else if (percentage >= 50) {
+            speak(`Tuviste ${correctCount} respuestas buenas de ${totalInputs}. Buen trabajo, has acertado ${totalInputs} Practica un poco más.`);
+        } else {
+            speak(`Tuviste ${correctCount} respuestas buenas de ${totalInputs}. No te rindas, intenta de nuevo con más cuidado.`);
+        }
+
+        nextContainer.appendChild(btn);
+    }
+}
+
+function resetPuzzle() {
+    document.getElementById('feedback').innerHTML = '';
+    document.getElementById('score').innerHTML = '';
+    createGrid();
+}
+
+window.addEventListener('resize', resizeConfettiCanvas);
+resizeConfettiCanvas();
+createGrid();
+</script>
+<script src="js/profile.js"></script>
+</body>
+</html>
